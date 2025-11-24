@@ -3,25 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ACCA TX (UK) 交互式知识图谱 (FA2024)</title>
+    <title>ACCA TX (UK) FA2024 深度知识图谱</title>
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
     <style>
-        body { margin: 0; padding: 0; overflow: hidden; background-color: #f4f4f4; }
+        body { margin: 0; padding: 0; overflow: hidden; background-color: #1a1a1a; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         #main { width: 100vw; height: 100vh; }
-        .header {
-            position: absolute; top: 20px; left: 20px; z-index: 100;
-            background: rgba(255, 255, 255, 0.9); padding: 15px; border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1); font-family: Arial, sans-serif;
+        
+        /* 悬浮面板样式 */
+        .info-panel {
+            position: absolute; top: 20px; left: 20px; width: 300px;
+            background: rgba(40, 40, 40, 0.9); color: #fff;
+            padding: 20px; border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1);
+            pointer-events: none; z-index: 100;
         }
+        .info-panel h1 { margin: 0 0 10px 0; font-size: 22px; color: #4facfe; }
+        .info-panel p { font-size: 13px; color: #bbb; line-height: 1.5; margin-bottom: 5px; }
+        
+        /* Tooltip 自定义样式 (用于JS中) */
+        .tooltip-card {
+            max-width: 350px; padding: 5px;
+        }
+        .tooltip-title { font-size: 16px; font-weight: bold; color: #333; margin-bottom: 8px; border-bottom: 2px solid #4facfe; padding-bottom: 5px; }
+        .tooltip-section { margin-bottom: 8px; font-size: 13px; color: #555; }
+        .tooltip-label { font-weight: bold; color: #005bea; display: inline-block; width: 60px; vertical-align: top;}
+        .tooltip-content { display: inline-block; width: 260px; }
+        .formula { background: #f0f4f8; padding: 3px 6px; border-radius: 4px; font-family: monospace; color: #d63031; display: block; margin-top: 2px; }
+        .case-box { background: #e8f5e9; border-left: 3px solid #00b894; padding: 5px; margin-top: 4px; font-style: italic; color: #2d3436; }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h2 style="margin:0 0 10px 0; color:#333;">ACCA TX (UK) 知识图谱</h2>
-        <p style="margin:0; font-size:14px; color:#666;">滚轮缩放 | 拖拽节点 | 悬停查看详情</p>
-        <p style="margin:5px 0 0 0; font-size:12px; color:#d93025;">*已更新至 FA2024 (25/26 考纲)</p>
+
+    <div class="info-panel">
+        <h1>ACCA TX (UK) FA24</h1>
+        <p>📅 <b>适用考期:</b> June 2025 - March 2026</p>
+        <p>👆 <b>交互指南:</b></p>
+        <p>• 滚轮缩放画布</p>
+        <p>• 拖拽节点调整布局</p>
+        <p>• <b>鼠标悬停节点</b> 查看定义、公式与案例</p>
+        <p style="margin-top:15px; font-size:12px; color:#666;">Designed for visual learning.</p>
     </div>
-    
+
     <div id="main"></div>
 
     <script type="text/javascript">
@@ -29,154 +52,43 @@
         var myChart = echarts.init(chartDom);
         var option;
 
-        // --- 1. 定义数据节点 (Nodes) ---
-        // 核心父节点
+        // ================= 数据集定义 =================
+        
+        // 1. 类别颜色定义
         const categories = [
-            { name: 'Root' },
-            { name: 'Income Tax (IT)' },
-            { name: 'Corporation Tax (CT)' },
-            { name: 'Capital Gains (CGT)' },
-            { name: 'Inheritance Tax (IHT)' },
-            { name: 'VAT' }
+            { name: 'Root', itemStyle: { color: '#f39c12' } },
+            { name: 'Income Tax', itemStyle: { color: '#e74c3c' } }, // 红
+            { name: 'Corporation Tax', itemStyle: { color: '#3498db' } }, // 蓝
+            { name: 'CGT', itemStyle: { color: '#9b59b6' } }, // 紫
+            { name: 'IHT', itemStyle: { color: '#2ecc71' } }, // 绿
+            { name: 'VAT', itemStyle: { color: '#1abc9c' } }  // 青
         ];
 
+        // 2. 节点数据 (含详细考点)
         const nodes = [
-            // 根节点
-            { id: '0', name: 'UK Tax System', symbolSize: 80, category: 0, value: '核心体系' },
+            // --- 根节点 ---
+            { id: '0', name: 'UK Tax System', symbolSize: 90, category: 0, 
+              details: { def: '英国核心税务体系', rule: 'FA 2024 (25/26 考纲)' } },
 
-            // 1. Income Tax 节点
-            { id: '1', name: 'Income Tax (个人所得税)', symbolSize: 60, category: 1 },
-            { id: '1.1', name: 'Rates & Bands', symbolSize: 40, category: 1, 
-              desc: '<b>税率:</b><br>Basic: 20%<br>Higher: 40%<br>Additional: 45%<br><b>股息:</b> 8.75% / 33.75% / 39.35%' },
-            { id: '1.2', name: 'Personal Allowance', symbolSize: 40, category: 1, 
-              desc: '<b>金额:</b> £12,570<br><b>ANI限制:</b> 超过£100k后每£2减少£1' },
-            { id: '1.3', name: 'Employment Income', symbolSize: 40, category: 1, 
-              desc: '<b>考点:</b> 薪资 + 福利 (Benefits) - 允许扣除的费用' },
-            { id: '1.4', name: 'NIC (社保)', symbolSize: 40, category: 1, 
-              desc: '<b>Class 1 (Emp):</b> 8% (FA24新规)<br><b>Class 4 (Self):</b> 6%' },
+            // ================= Income Tax (IT) =================
+            { id: '1', name: 'Income Tax\n(个人所得税)', symbolSize: 65, category: 1,
+              details: { def: '针对个人全球收入征税', rule: '纳税年度：4月6日 - 次年4月5日' } },
 
-            // 2. Corporation Tax 节点
-            { id: '2', name: 'Corporation Tax (公司税)', symbolSize: 60, category: 2 },
-            { id: '2.1', name: 'TTP & Rates', symbolSize: 40, category: 2, 
-              desc: '<b>小企业 (≤£50k):</b> 19%<br><b>大企业 (≥£250k):</b> 25%<br><b>边际减免:</b> 3/200' },
-            { id: '2.2', name: 'Capital Allowances', symbolSize: 40, category: 2, 
-              desc: '<b>Full Expensing:</b> 全新主池资产 100% FYA<br><b>AIA:</b> £1,000,000' },
-            { id: '2.3', name: 'Groups', symbolSize: 40, category: 2, 
-              desc: '<b>75% Group:</b> 亏损减免 (Group Relief)<br><b>Gains Group:</b> 资产无损转移' },
+            { id: '1.1', name: 'Personal Allowance\n(个人免税额)', symbolSize: 45, category: 1,
+              details: { 
+                  def: '每个纳税人的免税收入额度',
+                  rule: '标准额度: £12,570 <br> <span class="formula">ANI > £100k: 每£2收入减少£1 PA</span>',
+                  case: 'ANI为£110,000。PA减少 (£110k-£100k)/2 = £5,000。可用PA = £7,570。'
+              }},
+            
+            { id: '1.2', name: 'Employment Income\n(雇佣收入)', symbolSize: 45, category: 1,
+              details: {
+                  def: '薪资 + 福利 (Benefits) - 允许扣除费用',
+                  rule: '用车福利: List Price × CO2% (Base 55g/km).<br>燃油福利: £27,800 × CO2%',
+                  case: '汽油车排放120g/km。<br>率 = 16% + (120-55)/5 = 29%。<br>Benefit = List Price × 29%。'
+              }},
 
-            // 3. CGT 节点
-            { id: '3', name: 'CGT (资本利得)', symbolSize: 60, category: 3 },
-            { id: '3.1', name: 'Individuals', symbolSize: 40, category: 3, 
-              desc: '<b>AEA:</b> £3,000 (FA24)<br><b>税率:</b> 10%/20% (普通), 18%/24% (住宅)' },
-            { id: '3.2', name: 'BADR (商业资产)', symbolSize: 40, category: 3, 
-              desc: '<b>税率:</b> 10%<br><b>终身限额:</b> £1m<br><b>条件:</b> 持有2年以上' },
-            { id: '3.3', name: 'Rollover Relief', symbolSize: 40, category: 3, 
-              desc: '<b>滚动减免:</b> 出售商业资产并重投资，推迟纳税' },
-
-            // 4. IHT 节点
-            { id: '4', name: 'IHT (遗产税)', symbolSize: 60, category: 4 },
-            { id: '4.1', name: 'Death Tax', symbolSize: 40, category: 4, 
-              desc: '<b>NRB:</b> £325,000<br><b>RNRB:</b> £175,000<br><b>税率:</b> 40%' },
-            { id: '4.2', name: 'Lifetime Gifts', symbolSize: 40, category: 4, 
-              desc: '<b>PET:</b> 7年原则<br><b>CLT:</b> 立即征收20% (超出NRB部分)' },
-
-            // 5. VAT 节点
-            { id: '5', name: 'VAT (增值税)', symbolSize: 60, category: 5 },
-            { id: '5.1', name: 'Registration', symbolSize: 40, category: 5, 
-              desc: '<b>注册:</b> >£90,000 (FA24)<br><b>注销:</b> <£88,000' },
-            { id: '5.2', name: 'Schemes', symbolSize: 40, category: 5, 
-              desc: 'Cash Accounting / Annual Accounting / Flat Rate' }
-        ];
-
-        // --- 2. 定义连接关系 (Links) ---
-        const links = [
-            { source: '0', target: '1' },
-            { source: '0', target: '2' },
-            { source: '0', target: '3' },
-            { source: '0', target: '4' },
-            { source: '0', target: '5' },
-
-            { source: '1', target: '1.1' },
-            { source: '1', target: '1.2' },
-            { source: '1', target: '1.3' },
-            { source: '1', target: '1.4' },
-
-            { source: '2', target: '2.1' },
-            { source: '2', target: '2.2' },
-            { source: '2', target: '2.3' },
-
-            { source: '3', target: '3.1' },
-            { source: '3', target: '3.2' },
-            { source: '3', target: '3.3' },
-
-            { source: '4', target: '4.1' },
-            { source: '4', target: '4.2' },
-
-            { source: '5', target: '5.1' },
-            { source: '5', target: '5.2' }
-        ];
-
-        // --- 3. 图表配置 ---
-        option = {
-            tooltip: {
-                trigger: 'item',
-                formatter: function (params) {
-                    if (params.dataType === 'node') {
-                        // 显示节点名称和描述（如果有）
-                        var content = '<div style="font-weight:bold; font-size:16px;">' + params.data.name + '</div>';
-                        if (params.data.desc) {
-                            content += '<hr style="margin:5px 0; border:0; border-top:1px solid #ddd;">';
-                            content += '<div style="max-width:200px; white-space:normal;">' + params.data.desc + '</div>';
-                        }
-                        return content;
-                    }
-                },
-                backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                borderColor: '#ccc',
-                borderWidth: 1,
-                textStyle: { color: '#333' }
-            },
-            legend: {
-                data: categories.map(function (a) { return a.name; }).slice(1), // 排除Root
-                top: 'bottom'
-            },
-            series: [
-                {
-                    type: 'graph',
-                    layout: 'force', // 力引导布局
-                    data: nodes,
-                    links: links,
-                    categories: categories,
-                    roam: true, // 允许缩放和平移
-                    label: {
-                        show: true,
-                        position: 'right',
-                        formatter: '{b}'
-                    },
-                    lineStyle: {
-                        color: 'source',
-                        curveness: 0.3
-                    },
-                    force: {
-                        repulsion: 500, // 节点排斥力
-                        edgeLength: 120, // 连线长度
-                        gravity: 0.1
-                    },
-                    emphasis: {
-                        focus: 'adjacency', // 鼠标悬停时高亮相邻节点
-                        lineStyle: { width: 4 }
-                    },
-                    zoom: 0.8
-                }
-            ]
-        };
-
-        myChart.setOption(option);
-
-        // 响应窗口大小变化
-        window.addEventListener('resize', function() {
-            myChart.resize();
-        });
-    </script>
-</body>
-</html>
+            { id: '1.3', name: 'NIC (社保)', symbolSize: 45, category: 1,
+              details: {
+                  def: '国民保险贡献 (FA24 重大更新)',
+                  rule: '<b>Class 1 (员工):</b> £12,570-£50,270 之间税率降为 <span class="formula">8%</span>
