@@ -3,215 +3,231 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ACCA TX (UK) FA2024 Integrated Master Guide</title>
+    <title>ACCA TX (UK) Master Guide V15</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
-        /* === 莫兰迪综合主题 (PC/Mobile 适配) === */
-        :root {
-            /* 颜色定义 */
-            --iht-main: #1abc9c;  /* 薄荷绿 */
-            --cgt-main: #a29bfe;  /* 暮山紫 */
-            --text: #2c3e50;
-            --bg: #f4f7f6;
-            --glass: rgba(255, 255, 255, 0.95);
-        }
-
+        /* === 1. 沉浸式底层 (修复滚动冲突) === */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        body { margin: 0; padding: 0; overflow: hidden; background-color: var(--bg); font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-        #main { width: 100vw; height: 100vh; z-index: 1; }
+        body { 
+            margin: 0; padding: 0; overflow: hidden; 
+            background-color: #f4f7f6; /* 极淡护眼背景 */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+        }
+        
+        /* 确保图表容器全屏且层级正确 */
+        #main { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; }
 
-        /* 顶部栏 */
+        /* === 2. 界面 UI (点击穿透修复) === */
+        /* 顶部栏 - 设置 pointer-events: none 防止遮挡点击 */
         .header {
-            position: fixed; top: 0; left: 0; right: 0; height: 50px;
-            background: rgba(255,255,255,0.85); backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(0,0,0,0.05); z-index: 100;
+            position: fixed; top: 0; left: 0; right: 0; height: 60px;
+            padding: 0 20px; z-index: 10;
             display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            pointer-events: none; /* 关键修复：让点击穿透到图表 */
+            background: linear-gradient(to bottom, rgba(244,247,246,0.9), rgba(244,247,246,0));
         }
-        .header h1 { font-size: 16px; color: #555; font-weight: 800; letter-spacing: 1px; margin: 0; }
-        .badge { background: #2c3e50; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 10px; margin-left: 8px; }
+        /* 标题文字本身不需要穿透 */
+        .header h1 { 
+            font-size: 15px; color: #7f8c8d; font-weight: 700; letter-spacing: 1px; 
+            margin: 0; pointer-events: auto; 
+            background: rgba(255,255,255,0.8); padding: 6px 12px; border-radius: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
 
-        /* 详情面板 (自适应) */
-        .sheet-mask {
+        /* 底部提示 */
+        .tip {
+            position: fixed; bottom: 30px; width: 100%; text-align: center;
+            color: #bdc3c7; font-size: 12px; pointer-events: none; z-index: 5;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0% {opacity:0.6} 50% {opacity:1} 100% {opacity:0.6} }
+
+        /* === 3. 底部详情卡片 (交互核心) === */
+        .mask {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.25); z-index: 199; display: none; transition: opacity 0.3s;
+            background: rgba(0,0,0,0.2); z-index: 99; display: none;
+            backdrop-filter: blur(2px); transition: opacity 0.3s;
         }
-        .sheet-mask.active { display: block; opacity: 1; }
+        .mask.show { display: block; opacity: 1; }
 
-        .sheet-container {
+        .sheet {
             position: fixed; bottom: 0; left: 0; right: 0;
-            background: var(--glass); z-index: 200;
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.1);
-            transform: translateY(110%); transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
-            display: flex; flex-direction: column;
-            max-height: 85vh; /* 手机默认 */
-            border-radius: 24px 24px 0 0;
+            background: #fff; z-index: 100;
+            border-top-left-radius: 24px; border-top-right-radius: 24px;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.08);
+            transform: translateY(110%); transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+            display: flex; flex-direction: column; max-height: 85vh;
         }
-        /* 电脑端优化 */
-        @media (min-width: 768px) {
-            .sheet-container { max-height: 75vh; border-top: 1px solid #eee; }
-        }
-        .sheet-container.active { transform: translateY(0); }
+        .sheet.show { transform: translateY(0); }
 
-        /* 面板头部 */
+        /* 卡片头部 */
         .sheet-head {
-            padding: 18px 24px; border-bottom: 1px solid rgba(0,0,0,0.05);
+            padding: 18px 24px; border-bottom: 1px solid #f0f0f0;
             display: flex; justify-content: space-between; align-items: center;
-            background: #fff; border-radius: 24px 24px 0 0;
+            background: #fff; border-radius: 24px 24px 0 0; flex-shrink: 0;
         }
-        .sheet-title { font-size: 18px; font-weight: 800; color: var(--text); margin: 0; display:flex; align-items:center;}
-        .sheet-title::before { content:''; display:inline-block; width:6px; height:6px; border-radius:50%; margin-right:10px; background: #ccc; } /* JS会修改颜色 */
-        .close-btn { font-size: 24px; color: #b2bec3; cursor: pointer; }
+        .sheet-title { font-size: 18px; font-weight: 700; color: #2c3e50; margin: 0; display: flex; align-items: center; }
+        .sheet-dot { width: 8px; height: 8px; border-radius: 50%; margin-right: 10px; }
+        .close-btn { font-size: 24px; color: #b2bec3; cursor: pointer; padding: 5px; }
 
-        /* 内容区 */
-        .sheet-body { padding: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; flex: 1; }
-        .content-container { max-width: 800px; margin: 0 auto; padding: 24px; }
+        /* 卡片内容区 */
+        .sheet-body { padding: 0 20px 40px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        
+        /* --- 内容组件样式 --- */
+        .section { margin-top: 25px; }
+        
+        /* 标题带左侧色条 */
+        .sec-title { 
+            font-size: 13px; font-weight: 800; color: #34495e; margin-bottom: 10px; 
+            text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center;
+        }
+        .sec-title::before { content:''; display:inline-block; width:4px; height:14px; margin-right:8px; border-radius:2px; background: #ccc; }
 
-        /* --- 排版组件 --- */
-        /* 1. 定义块 */
-        .def-box { margin-bottom: 25px; border-left: 4px solid #ccc; padding-left: 12px; } /* JS修改边框色 */
-        .def-title { font-size: 12px; font-weight: 800; color: #999; margin-bottom: 6px; text-transform: uppercase; }
-        .def-text { font-size: 15px; line-height: 1.7; color: #555; text-align: justify; }
-
-        /* 2. 规则列表 */
-        .rule-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-bottom: 25px; }
+        /* 文本 */
+        .text-box { font-size: 15px; line-height: 1.7; color: #555; text-align: justify; }
+        .text-box li { margin-bottom: 6px; }
+        
+        /* 规则卡片 */
         .rule-card {
-            background: #fff; border: 1px solid #eee; border-radius: 8px; padding: 15px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.015);
+            background: #f9fbfb; border: 1px solid #eef2f3; border-radius: 8px;
+            padding: 12px 15px; margin-bottom: 10px;
         }
-        .rule-head { font-size: 12px; font-weight: 800; margin-bottom: 6px; color: #555; }
-        .rule-body { font-size: 14px; color: #333; line-height: 1.5; }
-
-        /* 3. 案例/模板 */
+        .rule-head { font-size: 12px; font-weight: 700; margin-bottom: 4px; color: #7f8c8d; }
+        
+        /* 案例盒子 */
         .case-box {
-            background: #fcfcfc; border: 1px solid #f0f0f0; border-radius: 8px;
-            padding: 15px; margin-top: 15px;
+            background: #fff; border: 1px solid #eee; border-radius: 10px;
+            padding: 0; margin-top: 15px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.03);
         }
-        .case-head { font-weight: 700; color: #2c3e50; margin-bottom: 8px; font-size: 14px; }
-        .case-body { font-size: 14px; color: #444; white-space: pre-wrap; font-family: -apple-system, sans-serif; line-height: 1.6; }
-
-        /* 4. 折叠解析 */
-        details { margin-top: 10px; border-top: 1px dashed #eee; padding-top: 10px; }
+        .case-head { padding: 12px 15px; background: #fcfdfd; border-bottom: 1px solid #f0f0f0; font-weight: 700; font-size: 14px; color: #2c3e50; }
+        .case-content { padding: 15px; font-size: 14px; color: #444; line-height: 1.6; }
+        
+        /* 折叠解析 */
+        details { border-top: 1px solid #f5f5f5; }
         summary {
-            cursor: pointer; font-size: 13px; color: #7f8c8d; font-weight: 600;
+            padding: 12px 15px; cursor: pointer; font-size: 13px; color: #3498db; font-weight: 600;
             list-style: none; display: flex; justify-content: space-between;
         }
-        summary::after { content: '查看解析 ▼'; color: #aaa; }
-        details[open] summary::after { content: '收起 ▲'; }
+        summary::after { content: '+ 解析'; color: #bdc3c7; }
+        details[open] summary { color: #7f8c8d; background: #fafafa; }
+        details[open] summary::after { content: '- 收起'; }
         
-        .analysis {
-            background: #f8f9fa; padding: 15px; border-radius: 6px; margin-top: 10px;
-            font-family: "Menlo", monospace; font-size: 13px; color: #2c3e50; line-height: 1.6; white-space: pre-wrap; border: 1px solid #eee;
+        .ans { 
+            padding: 15px; background: #fbfbfb; font-family: "Menlo", monospace; 
+            font-size: 13px; color: #333; line-height: 1.6; white-space: pre-wrap; border-top: 1px dashed #eee;
         }
 
         /* BOSS 题 */
-        .boss-card {
-            background: #fff; border: 2px solid #e67e22; border-radius: 12px;
-            overflow: hidden; margin-top: 20px;
-        }
-        .boss-header {
-            background: #e67e22; color: #fff; padding: 10px 15px;
-            font-size: 14px; font-weight: 800; letter-spacing: 1px;
-        }
-        .boss-body { padding: 15px; font-size: 14px; color: #333; line-height: 1.6; }
+        .boss-container { border: 2px solid #ffcb89; border-radius: 10px; overflow: hidden; margin-top: 20px; }
+        .boss-header { background: #ffeaa7; color: #d35400; padding: 12px 15px; font-weight: 800; font-size: 14px; }
 
-        /* 表格 */
-        .tax-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
-        .tax-table th { background: #f1f2f6; color: #333; padding: 8px; text-align: left; border:1px solid #ddd; }
-        .tax-table td { border: 1px solid #ddd; padding: 8px; }
-
-        .hl-red { color: #c0392b; font-weight: bold; }
+        /* 高亮 */
+        .hl { font-weight: bold; color: #2c3e50; background: #e8f6f3; padding: 0 4px; border-radius: 3px; }
 
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h1>ACCA TX (UK) <span class="badge">FA2024</span></h1>
+        <h1>TX (UK) <span style="color:#bbb">|</span> Master Guide</h1>
     </div>
 
     <div id="main"></div>
+    <div class="tip">点击节点查看详情</div>
 
-    <div class="sheet-mask" id="mask" onclick="closeSheet()"></div>
-    <div class="sheet-container" id="sheet">
+    <div class="mask" id="mask" onclick="closeSheet()"></div>
+    <div class="sheet" id="sheet">
         <div class="sheet-head">
-            <h2 class="sheet-title" id="sheetTitle">Topic</h2>
+            <div class="sheet-title">
+                <div class="sheet-dot" id="sheetDot"></div>
+                <span id="sheetTitle">Title</span>
+            </div>
             <div class="close-btn" onclick="closeSheet()">×</div>
         </div>
-        <div class="sheet-body">
-            <div class="content-container" id="sheetContent"></div>
-        </div>
+        <div class="sheet-body" id="sheetContent">
+            </div>
     </div>
 
     <script type="text/javascript">
         var chartDom = document.getElementById('main');
-        var myChart = echarts.init(chartDom, null, {renderer: 'canvas'});
+        var myChart = echarts.init(chartDom, null, {renderer: 'canvas'}); // 强制Canvas渲染以提升移动端性能
 
-        // ================= 1. 配色定义 =================
+        // ================= 配色系统 (莫兰迪) =================
         const c = {
-            root: '#34495e',   // 总根 (深灰)
-            iht: '#1abc9c',    // IHT (薄荷绿)
-            iht_sub: '#a8e6cf',
-            cgt: '#a29bfe',    // CGT (暮山紫)
-            cgt_sub: '#dcd6f7',
-            boss: '#e67e22'    // BOSS题 (橙色)
+            iht: '#1abc9c',     // 薄荷绿 (IHT主色)
+            iht_light: '#a8e6cf',
+            cgt: '#a29bfe',     // 暮山紫 (CGT主色)
+            cgt_light: '#dcd6f7',
+            root: '#34495e',    // 深灰 (Root)
+            boss: '#fdcb6e'     // 暖橙 (BOSS)
         };
 
-        // ================= 2. 节点数据 (Merged IHT + CGT) =================
+        // ================= 数据内容库 =================
         const data = [
-            // --- Grand Root ---
+            // --- Root ---
             {
-                id: '0', name: 'ACCA TX\n(UK)', category: 'ROOT', symbolSize: 60,
-                itemStyle: { color: c.root, shadowBlur: 15, shadowColor: 'rgba(0,0,0,0.2)' },
-                info: { def: 'FA2024 核心复习图谱 (June 25 - Mar 26)', rules: [{t:'包含模块', c:'IHT (遗产税) + CGT (资本利得税)'}] }
+                id: '0', name: 'ACCA TX\n(UK)', category: 'ROOT', symbolSize: 55,
+                itemStyle: { color: c.root, shadowBlur: 15, shadowColor: 'rgba(0,0,0,0.3)' },
+                info: { def: 'FA2024 核心复习图谱 (June 25 - Mar 26)。<br>点击分支查看 <b>IHT (遗产税)</b> 和 <b>CGT (资本利得税)</b> 详解。' }
             },
 
             // =================== IHT 模块 (薄荷绿) ===================
             {
-                id: 'iht_root', name: 'IHT\n遗产税', category: 'IHT', symbolSize: 50,
+                id: 'iht_root', name: 'IHT\n遗产税', category: 'IHT', symbolSize: 45,
                 itemStyle: { color: c.iht },
                 info: {
-                    def: '基于价值转移 (Transfer of Value)。',
+                    def: '基于<b>价值转移 (Transfer of Value)</b>，即捐赠导致捐赠者财富减少的金额。',
                     rules: [
-                        {t: 'NRB', c: '£325,000'}, {t: 'RNRB', c: '£175,000'},
-                        {t: 'Death Rate', c: '40%'}, {t: 'Lifetime', c: '20% (Trustee) / 25% (Donor)'}
+                        {t: 'Nil Rate Band (NRB)', c: '£325,000'},
+                        {t: 'Resi NRB (RNRB)', c: '£175,000'},
+                        {t: 'Death Rate', c: '40%'},
+                        {t: 'Lifetime Rate', c: '20% (Trustee) / 25% (Donor)'}
                     ]
                 }
             },
             {
-                id: 'iht_life', name: 'Lifetime\n生前转移', category: 'IHT_SUB', symbolSize: 35, itemStyle: { color: c.iht_sub },
+                id: 'iht_life', name: 'Lifetime\n生前转移', category: 'IHT', symbolSize: 35, itemStyle: { color: c.iht_light },
                 info: {
-                    def: '豁免 / PET / CLT',
+                    def: '生前礼物的三类处理方式：',
                     rules: [
-                        {t: 'Exempt', c: 'Spouse (无限), AE (£3k/yr), Marriage (£5k/2.5k/1k), Small Gifts (£250).'},
-                        {t: 'PET', c: '个人对个人。生前0税。活过7年免税。'},
-                        {t: 'CLT', c: '个人对信托。立即交税 (20%)。7年累积原则。'}
+                        {t: 'A. Exempt (豁免)', c: 'Spouse (无限), AE (£3k), Marriage (£5k/2.5k/1k), Small Gifts (£250)。'},
+                        {t: 'B. PET (个人)', c: '生前不交税。活过7年免税；7年内死补交。'},
+                        {t: 'C. CLT (信托)', c: '立即交税 (20%)。7年累积原则。'}
                     ],
-                    cases: [{t: '案例: 精打细算的爷爷', s: '2024年送孙子结婚礼物 £8,000。上年未赠予。', a: 'Transfer: £8,000\n(-) Marriage: (£2,500)\n(-) AE Cur: (£3,000)\n(-) AE BF: (£2,500)\n= Chargeable: £0'}]
+                    cases: [
+                        {t: '案例 1: 精打细算的爷爷', s: '2024年送孙子结婚礼物 £8,000。上年未赠予。', a: 'Transfer: £8,000\n(-) Marriage: (£2,500)\n(-) AE Cur: (£3,000)\n(-) AE BF: (£2,500)\n= Chargeable: £0'},
+                        {t: '案例 2: 富豪的信托 (CLT)', s: '转入信托 £400,000。此前7年无 CLT。', a: 'Gross: £400,000\nLess NRB: (£325,000)\nTaxable: £75,000\nTax @ 20% = £15,000'}
+                    ]
                 }
             },
             {
-                id: 'iht_death', name: 'Death Tax\n死后追溯', category: 'IHT_SUB', symbolSize: 35, itemStyle: { color: c.iht_sub },
+                id: 'iht_death', name: 'Death Tax\n死后追溯', category: 'IHT', symbolSize: 35, itemStyle: { color: c.iht_light },
                 info: {
-                    def: '死前7年内的 PET/CLT 重算。',
+                    def: '死前 7 年内的 PET/CLT 需重算。',
                     rules: [
-                        {t: '步骤', c: '1. 找7年内礼物 2. 扣NRB (Look back 7 yrs from GIFT) 3. 算40%税 4. Taper Relief'},
-                        {t: 'Taper', c: '3-4yr: 80% of tax ... 6-7yr: 20% of tax'}
+                        {t: '步骤', c: '1. 找7年内礼物 2. 扣 NRB (Look back 7 yrs from GIFT) 3. 算 40% 税 4. Taper Relief'},
+                        {t: 'Taper', c: '3-4yr: 20% off ... 6-7yr: 80% off'}
                     ],
-                    cases: [{t: '案例: 不幸的富豪', s: '送出 £100k PET 后 4.5 年去世。', a: 'Gross: £100,000\nNRB Available: £325,000\nTax: £0 (Covered)\n(但吃掉了 £100k NRB)'}]
+                    cases: [
+                        {t: '案例 3: 不幸的富豪', s: '送出 £100k PET 后 4.5 年去世。', a: 'Gross: £100,000\nAvail NRB: £325,000\nTax: £0 (Covered)\n(但吃掉了 £100k NRB，影响后续遗产税)'}
+                    ]
                 }
             },
             {
-                id: 'iht_estate', name: 'Estate\n死亡遗产', category: 'IHT_SUB', symbolSize: 35, itemStyle: { color: c.iht_sub },
+                id: 'iht_estate', name: 'Estate\n死亡遗产', category: 'IHT', symbolSize: 35, itemStyle: { color: c.iht_light },
                 info: {
                     def: '死亡时资产总值 (Probate Value)。',
-                    rules: [{t: 'RNRB £175k', c: '条件: 主居所 + 直系后代。'}, {t: 'Spouse', c: '配偶继承免税。'}],
-                    cases: [{t: '案例: 最后的遗产', s: '留给孙子房£400k + 其他£200k。', a: 'Estate: £600,000\n(-) RNRB: (£175,000)\n(-) NRB: (£325,000)\nTaxable: £100,000\nTax @ 40% = £40,000'}]
+                    rules: [
+                        {t: 'RNRB £175k', c: '条件: 主居所 + 直系后代。'},
+                        {t: '计算', c: 'Assets - Debts - Exemptions = Chargeable Estate'}
+                    ],
+                    cases: [
+                        {t: '案例 4: 最后的遗产', s: '留给孙子房£400k + 其他£200k。', a: 'Estate: £600,000\n(-) RNRB: (£175,000)\n(-) NRB: (£325,000)\nTaxable: £100,000\nTax @ 40% = £40,000'}
+                    ]
                 }
             },
             {
-                id: 'iht_boss', name: 'IHT BOSS\n综合大题', category: 'BOSS', symbolSize: 45, itemStyle: { color: c.boss },
+                id: 'iht_boss', name: 'BOSS\n综合大题', category: 'IHT', symbolSize: 45, itemStyle: { color: c.boss, shadowBlur: 10, shadowColor: c.boss },
                 info: {
                     isBoss: true, title: '👹 IHT 终极战：NRB 耗尽',
                     scen: 'Mr. Bond (2026年3月去世)。\n1. 2019.8 CLT £280k\n2. 2021.10 PET £150k\n3. Estate: 房£500k(给儿), 股£300k, 债£25k。',
@@ -236,53 +252,40 @@ Taxable: £600,000
                 id: 'cgt_root', name: 'CGT\n资本利得', category: 'CGT', symbolSize: 50,
                 itemStyle: { color: c.cgt },
                 info: {
-                    def: '处置资产利得税 (Capital Gains Tax)。',
+                    def: '处置资产利得税。FA24 住宅税率降低。',
                     rules: [
-                        {t: 'AEA', c: '<b>£3,000</b> (FA24)'},
-                        {t: 'Normal Rates', c: '10% / 20%'},
-                        {t: 'Residential', c: '18% / <span class="hl-red">24%</span> (FA24 新税率)'},
+                        {t: 'AEA', c: '£3,000'},
+                        {t: 'Rates', c: 'Normal: 10/20% | Resi: 18/24%'},
                         {t: 'BADR', c: '10% (Limit £1m)'}
                     ]
                 }
             },
             {
-                id: 'cgt_comp', name: 'Compute\n计算规则', category: 'CGT_SUB', symbolSize: 35, itemStyle: { color: c.cgt_sub },
+                id: 'cgt_comp', name: 'Rules\n计算规则', category: 'CGT', symbolSize: 35, itemStyle: { color: c.cgt_light },
                 info: {
                     def: '计算框架与 Loss 抵扣。',
                     rules: [{t: 'Losses', c: 'CY Loss 必须全抵; BF Loss 只抵到 AEA 为止。'}],
-                    proformas: [{t: 'Proforma', c: 'Proceeds - Cost - Enhancement = Gain'}],
-                    cases: [{t: '案例: 房产 vs 股票', s: '卖房赚£20k (High Rate)，卖股赚£10k。', a: 'AEA 优先抵扣房产 (24% > 20%)。\nResi Taxable: 20k-3k=17k @ 24% = £4,080\nShare Taxable: 10k @ 20% = £2,000'}]
+                    cases: [{t: '案例: 房产 vs 股票', s: '卖房赚£20k (High Rate)，卖股赚£10k。', a: 'AEA 优先抵扣房产 (24% > 20%)。\nResi Taxable: 17k @ 24% = £4,080\nShare Taxable: 10k @ 20% = £2,000'}]
                 }
             },
             {
-                id: 'cgt_asset', name: 'Assets\n特殊资产', category: 'CGT_SUB', symbolSize: 35, itemStyle: { color: c.cgt_sub },
+                id: 'cgt_asset', name: 'Assets\n特殊资产', category: 'CGT', symbolSize: 35, itemStyle: { color: c.cgt_light },
                 info: {
-                    def: 'Chattels (动产) & Shares (股票)。',
+                    def: 'Chattels & Shares。',
                     rules: [
-                        {t: 'Chattels', c: '£6k 规则。Wasting (<50yr) 豁免。Non-wasting 买卖<6k 豁免。Marginal Relief: 5/3 x (Proceeds - 6k)。'},
-                        {t: 'Shares', c: '匹配顺序: 1. Same Day 2. Next 30 Days 3. Share Pool (均价)。'}
+                        {t: 'Chattels', c: '£6k 规则。Marginal Relief: 5/3 x (Proceeds - 6k)。'},
+                        {t: 'Shares', c: '匹配: 1. Same Day 2. Next 30 Days 3. Pool。'}
                     ]
                 }
             },
             {
-                id: 'cgt_relief', name: 'Reliefs\n核心减免', category: 'CGT_SUB', symbolSize: 35, itemStyle: { color: c.cgt_sub },
-                info: {
-                    def: 'BADR, ROR, Gift, PPR。',
-                    rules: [
-                        {t: 'BADR', c: '税率 10%。条件: 经营2年。'},
-                        {t: 'Rollover (ROR)', c: '卖旧买新，Gain 推迟。窗口: -1yr ~ +3yr。'},
-                        {t: 'PPR', c: '自住房豁免。最后9个月视同居住。'}
-                    ]
-                }
-            },
-            {
-                id: 'cgt_boss', name: 'CGT BOSS\n综合大题', category: 'BOSS', symbolSize: 45, itemStyle: { color: c.boss },
+                id: 'cgt_boss', name: 'BOSS\n综合大题', category: 'CGT', symbolSize: 45, itemStyle: { color: c.boss, shadowBlur: 10, shadowColor: c.boss },
                 info: {
                     isBoss: true, title: '👹 CGT 终极战：Mr. Lucky',
                     scen: 'Mr. Lucky (High Rate) 2025/26:\n1. 卖花瓶: 卖£8k, 买£4k。\n2. 卖咖啡店: 赚£200k (BADR)。\n3. 卖股票: 1000股@£5 (Pool Cost £2.67)。\n4. BF Loss £500。',
                     ans: `<b>Step 1: Chattel (Vase)</b>
-Marginal Relief: 5/3 × (8000 - 6000) = £3,333.
-(Normal Gain £4k, 取小值) -> <b>£3,333</b>
+Marginal: 5/3 × (8000 - 6000) = £3,333.
+(Take lower) -> <b>£3,333</b>
 
 <b>Step 2: Business (BADR)</b>
 £200,000 @ 10% = <b>£20,000</b>
@@ -294,30 +297,25 @@ Gain = 1000 × (5 - 2.67) = <b>£2,333</b>
 Total Gains = 205,666
 (-) Loss £500 (-) AEA £3,000
 Taxable = £202,166
-(BADR 200k @ 10%; Remainder 2,166 @ 20%)
+(BADR @ 10%; Rest @ 20%)
 <b>Total Tax = £20,433</b>`
                 }
             }
         ];
 
-        // ================= 3. 连线关系 =================
         const links = [
-            // Root -> Main
             { source: '0', target: 'iht_root' },
             { source: '0', target: 'cgt_root' },
-            // IHT Internal
             { source: 'iht_root', target: 'iht_life' },
             { source: 'iht_life', target: 'iht_death' },
             { source: 'iht_death', target: 'iht_estate' },
             { source: 'iht_estate', target: 'iht_boss' },
-            // CGT Internal
             { source: 'cgt_root', target: 'cgt_comp' },
             { source: 'cgt_comp', target: 'cgt_asset' },
-            { source: 'cgt_root', target: 'cgt_relief' },
-            { source: 'cgt_relief', target: 'cgt_boss' }
+            { source: 'cgt_asset', target: 'cgt_boss' }
         ];
 
-        // ================= 4. 渲染配置 =================
+        // ================= ECharts 配置 =================
         const option = {
             backgroundColor: 'transparent',
             series: [{
@@ -326,23 +324,38 @@ Taxable = £202,166
                 data: data,
                 links: links,
                 roam: true,
-                zoom: 0.8,
-                label: { show: true, position: 'bottom', color: '#666', fontSize: 11, fontWeight: 'bold', formatter: '{b}' },
+                zoom: 0.85, // 完美适配手机首屏
+                label: {
+                    show: true,
+                    position: 'bottom',
+                    color: '#7f8c8d',
+                    fontSize: 11,
+                    fontWeight: 'bold',
+                    formatter: '{b}',
+                    distance: 8
+                },
                 itemStyle: { borderColor: '#fff', borderWidth: 2 },
-                lineStyle: { color: '#d1d8e0', curveness: 0.15, width: 1.5 },
-                force: { repulsion: 450, edgeLength: 90, gravity: 0.05 }
+                lineStyle: {
+                    color: '#bdc3c7',
+                    curveness: 0.2, // 丝滑曲线
+                    width: 1.5,
+                    opacity: 0.6
+                },
+                force: {
+                    repulsion: 400, // 节点间距适中
+                    edgeLength: 90,
+                    gravity: 0.06
+                }
             }]
         };
 
         myChart.setOption(option);
         window.addEventListener('resize', () => myChart.resize());
 
-        // ================= 5. 交互逻辑 =================
+        // ================= 交互逻辑 (修复点击) =================
         const mask = document.getElementById('mask');
         const sheet = document.getElementById('sheet');
-        const titleDom = document.getElementById('sheetTitle');
-        const contentDom = document.getElementById('sheetContent');
-
+        
         myChart.on('click', function(params) {
             if (params.data && params.data.info) openSheet(params.data);
         });
@@ -350,48 +363,53 @@ Taxable = £202,166
         function openSheet(node) {
             const info = node.info;
             const color = node.itemStyle.color;
+
+            // 注入标题颜色
+            document.getElementById('sheetTitle').innerText = node.name.replace('\n', ' ');
+            document.getElementById('sheetTitle').style.color = color;
+            document.getElementById('sheetDot').style.background = color;
             
-            // 设置标题颜色
-            titleDom.innerText = node.name.replace('\n', ' ');
-            titleDom.style.color = color;
-            document.querySelector('.sheet-title::before').style.background = color;
-            document.querySelector('.def-box').style.borderLeftColor = color;
+            // 注入 CSS 变量以控制边框颜色
+            document.getElementById('sheetContent').innerHTML = renderContent(info, color);
+            
+            mask.classList.add('active');
+            sheet.classList.add('active');
+        }
 
+        function renderContent(info, color) {
             let html = '';
-
+            
             if (info.isBoss) {
-                html += `<div class="boss-card">
+                html += `<div class="boss-container">
                             <div class="boss-header">🔥 ${info.title}</div>
-                            <div class="boss-body" style="white-space:pre-wrap">${info.scen}</div>
+                            <div class="boss-body" style="white-space:pre-wrap; padding:15px; font-size:14px; color:#333">${info.scen}</div>
                          </div>
-                         <details open><summary>解析过程</summary><div class="analysis">${info.ans}</div></details>`;
+                         <details open><summary style="color:#d35400">解析过程</summary><div class="ans">${info.ans}</div></details>`;
             } else {
-                if(info.def) html += `<div class="def-box"><div class="def-title" style="color:${color}">Core Definition</div><div class="def-text">${info.def}</div></div>`;
+                if (info.def) html += `<div class="def-box"><div class="sec-title" style="color:${color}">Core Definition</div><div class="text-box">${info.def}</div></div>`;
                 
-                if(info.rules) {
-                    html += `<div class="rule-grid">`;
+                if (info.rules) {
+                    html += `<div class="section">`;
                     info.rules.forEach(r => {
-                        html += `<div class="rule-card"><div class="rule-head" style="color:${color}">${r.t}</div><div class="rule-body">${r.c}</div></div>`;
+                        html += `<div class="rule-card">
+                                    <div class="rule-head" style="color:${color}">${r.t}</div>
+                                    <div class="text-box">${r.c}</div>
+                                 </div>`;
                     });
                     html += `</div>`;
                 }
 
-                if(info.cases) {
+                if (info.cases) {
                     info.cases.forEach(c => {
-                        html += `<div class="case-box" style="border-left-color:${color}"><div class="case-head" style="color:${color}">🌰 ${c.t}</div><div class="case-body">${c.s}</div><details><summary>解析</summary><div class="analysis">${c.a}</div></details></div>`;
-                    });
-                }
-                
-                if(info.proformas) {
-                    info.proformas.forEach(p => {
-                         html += `<div class="rule-card" style="background:#f9f9f9; border-color:#eee"><div class="rule-head" style="color:#2c3e50">📝 ${p.t}</div><div class="rule-body" style="font-family:monospace; white-space:pre-wrap">${p.c}</div></div>`;
+                        html += `<div class="case-box" style="border-left-color:${color}">
+                                    <div class="case-head" style="color:${color}">🌰 ${c.t}</div>
+                                    <div class="case-content">${c.s}</div>
+                                    <details><summary>解析</summary><div class="ans">${c.a}</div></details>
+                                 </div>`;
                     });
                 }
             }
-
-            contentDom.innerHTML = html;
-            mask.classList.add('active');
-            sheet.classList.add('active');
+            return html;
         }
 
         function closeSheet() {
