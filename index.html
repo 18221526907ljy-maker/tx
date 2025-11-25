@@ -30,7 +30,7 @@
         }
         .badge { background: #2c3e50; color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-left: 8px; }
 
-        /* === 3. 底部详情弹窗 (支持长内容滚动) === */
+        /* === 3. 底部详情弹窗 (尺寸适配核心修改) === */
         .mask {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.3); z-index: 99; 
@@ -46,8 +46,25 @@
             transform: translateY(110%); 
             transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
             display: flex; flex-direction: column; 
-            max-height: 85vh; /* 增加高度以容纳完整笔记 */
+            /* 默认移动端高度 */
+            max-height: 85vh; 
         }
+
+        /* --- 💻 电脑端/平板端 尺寸适配优化 --- */
+        @media (min-width: 768px) {
+            .sheet {
+                /* 电脑端：高度增加至 92%，提供沉浸式阅读体验 */
+                max-height: 92vh; 
+                /* 边框微调 */
+                border-top: 1px solid #e0e0e0;
+            }
+            /* 电脑端：内容容器加宽 */
+            .content-container {
+                max-width: 1000px !important; /* 从800px增加到1000px */
+            }
+        }
+        /* ------------------------------------- */
+
         .sheet.active { transform: translateY(0); }
 
         /* 头部 */
@@ -65,8 +82,16 @@
 
         /* 内容区 */
         .sheet-body { 
-            padding: 20px 24px 50px 24px; 
+            padding: 0; /* Padding交给内部容器控制 */
             overflow-y: auto; -webkit-overflow-scrolling: touch; 
+            width: 100%;
+        }
+        
+        /* 内容限制容器 (用于在大屏居中内容) */
+        .content-container {
+            max-width: 800px; /* 移动端默认宽度 */
+            margin: 0 auto; 
+            padding: 20px 24px 50px 24px;
         }
 
         /* === 4. 内容排版组件 (笔记还原) === */
@@ -133,7 +158,9 @@
             <div class="sheet-title" id="sheetTitle">Topic</div>
             <div class="close-btn" onclick="closeSheet()">×</div>
         </div>
-        <div class="sheet-body" id="sheetContent"></div>
+        <div class="sheet-body">
+            <div class="content-container" id="sheetContent"></div>
+        </div>
     </div>
 
     <script type="text/javascript">
@@ -153,13 +180,13 @@
         // ================= 完整笔记内容库 (1:1 还原) =================
         const data = [
             {
-                id: 'root', name: 'ACCA TX\n(UK)', category: 'ROOT', symbolSize: 65, itemStyle: { color: c.root },
+                id: 'root', name: 'ACCA TX\n(UK)', category: 'ROOT', symbolSize: 55, itemStyle: { color: c.root },
                 info: { title: '核心复习体系', html: `<div class="text-content">包含 IHT (遗产税) 和 CGT (资本利得税) 两大模块的完整复习笔记。<br>数据基于 FA2024 (25/26 考季)。</div>` }
             },
 
             // ======================= IHT 模块 =======================
             {
-                id: 'iht_1', name: '1. Principles\n核心概念', category: 'IHT', symbolSize: 50, itemStyle: { color: c.iht },
+                id: 'iht_1', name: '1. Principles\n核心概念', category: 'IHT', symbolSize: 40, itemStyle: { color: c.iht },
                 info: {
                     title: '1. 核心概念与税率 (Basic Principles)',
                     html: `
@@ -187,7 +214,7 @@
                 }
             },
             {
-                id: 'iht_2', name: '2. Lifetime\n生前转移', category: 'IHT', symbolSize: 40, itemStyle: { color: c.iht_sub },
+                id: 'iht_2', name: '2. Lifetime\n生前转移', category: 'IHT', symbolSize: 35, itemStyle: { color: c.iht_sub },
                 info: {
                     title: '2. 生前转移 (Lifetime Transfers)',
                     html: `
@@ -247,7 +274,7 @@ Lifetime Tax: £75,000 × 20% = £15,000</div>
                 }
             },
             {
-                id: 'iht_3', name: '3. Death Tax\n死后追溯', category: 'IHT', symbolSize: 40, itemStyle: { color: c.iht_sub },
+                id: 'iht_3', name: '3. Death Tax\n死后追溯', category: 'IHT', symbolSize: 35, itemStyle: { color: c.iht_sub },
                 info: {
                     title: '3. 死亡时的额外税',
                     html: `
@@ -287,7 +314,7 @@ Tax Payable: £0
                 }
             },
             {
-                id: 'iht_4', name: '4. Estate\n死亡遗产', category: 'IHT', symbolSize: 40, itemStyle: { color: c.iht_sub },
+                id: 'iht_4', name: '4. Estate\n死亡遗产', category: 'IHT', symbolSize: 35, itemStyle: { color: c.iht_sub },
                 info: {
                     title: '4. 死亡遗产税 (Death Estate)',
                     html: `
@@ -326,7 +353,7 @@ Tax: £100,000 × 40% = £40,000</div>
                 }
             },
             {
-                id: 'iht_5', name: '5. Proforma\n计算模板', category: 'IHT', symbolSize: 40, itemStyle: { color: c.iht_sub },
+                id: 'iht_5', name: '5. Proforma\n计算模板', category: 'IHT', symbolSize: 35, itemStyle: { color: c.iht_sub },
                 info: {
                     title: '5. 必背计算模板',
                     html: `
@@ -356,7 +383,7 @@ Tax: £100,000 × 40% = £40,000</div>
                 }
             },
             {
-                id: 'iht_boss', name: 'IHT BOSS\n综合大题', category: 'IHT', symbolSize: 50, itemStyle: { color: c.boss },
+                id: 'iht_boss', name: 'IHT BOSS\n综合大题', category: 'IHT', symbolSize: 45, itemStyle: { color: c.boss },
                 info: {
                     title: '👹 终极 BOSS 战',
                     html: `
@@ -436,7 +463,7 @@ Less: Remaining NRB: (£0) (被生前礼物耗尽)
 
                         <div class="case-box">
                             <div class="case-header">🌰 案例 1：普通资产 vs 房产</div>
-                            <div class="case-body">Jack (Higher Rate) 卖画赚 £10k，卖房赚 £20k。无亏损。</div>
+                            <div class="case-body">Jack (Higher Rate) 2025/26 卖画赚 £10k，卖房赚 £20k。无亏损。</div>
                             <details>
                                 <summary>查看解析</summary>
                                 <div class="ans">Taxable Gains = (£10k + £20k) - £3,000 = £27,000
@@ -499,38 +526,37 @@ Total = £6,080</div>
                 }
             },
             {
-                id: 'cgt_boss', name: 'CGT BOSS\n综合大题', category: 'CGT', symbolSize: 50, itemStyle: { color: c.boss },
+                id: 'cgt_boss', name: 'CGT BOSS\n综合大题', category: 'CGT', symbolSize: 45, itemStyle: { color: c.boss },
                 info: {
                     title: '👹 终极 BOSS 战',
                     html: `
                         <div class="case-box" style="border-color:${c.boss}; background:#fffbf0;">
                             <div class="case-header" style="color:#e67e22">Mr. Lucky 综合题</div>
-                            <div class="case-body"><b>背景：</b> Mr. Lucky (Higher Rate) 2025/26 操作：<br>1. 卖花瓶: 卖 £8k, 买 £4k。<br>2. 卖咖啡店: 赚 £200k (BADR)。<br>3. 卖股票: 1000股 @ £5 (2010买500@£1k; 2020买1000@£3k)。<br>4. BF Loss £500。</div>
+                            <div class="case-body"><b>背景：</b> Mr. Lucky (Higher Rate) 2025/26 操作：<br>1. 卖花瓶: 卖 £8k, 买 £4k。<br>2. 卖咖啡店 (Business): 赚 £200k (BADR)。<br>3. 卖股票: 1000股 @ £5 (2010买500@£1k; 2020买1000@£3k)。<br>4. BF Loss £500。</div>
                             
                             <details open>
                                 <summary>查看详细解析</summary>
-                                <div class="ans"><b>1. 花瓶 (Chattel):</b>
-Normal Gain = 8k - 4k = 4,000
-Marginal = 5/3 × (8,000 - 6,000) = 3,333
-Chargeable = <b>£3,333</b> (取小)
+                                <div class="ans"><b>Step 1: Chattel (Vase)</b>
+Marginal: 5/3 × (8000 - 6000) = £3,333.
+(Normal Gain 4k, 取小值) -> <b>£3,333</b>
 
-<b>2. 咖啡店 (Business):</b>
-Gain £200,000. 税率 10% (BADR).
+<b>Step 2: Business (BADR)</b>
+£200,000 @ 10% = <b>£20,000</b>
 
-<b>3. 股票 (Shares):</b>
-Pool: 1500股, Cost £4000. Avg £2.67/股.
-Cost = 1000 × 2.67 = 2,667
+<b>Step 3: Shares</b>
+Pool: 1500股, Cost (1k+3k)=£4k. Avg £2.67/股.
+Disposal Cost: 1000 × 2.67 = £2,667
 Gain = 5,000 - 2,667 = <b>£2,333</b>
 
-<b>4. 汇总计算:</b>
+<b>Step 4: Total Tax</b>
 Total Gains = 205,666
 (-) Loss £500 (-) AEA £3,000
 Taxable = £202,166
 
-Tax:
-BADR: 200,000 @ 10% = 20,000
-Remaining: 2,166 @ 20% = 433
-<b>Total CGT = £20,433</b></div>
+Tax Calculation:
+1. BADR (200k) @ 10% = 20,000
+2. Remainder (2,166) @ 20% = 433
+<b>Total Tax = £20,433</b></div>
                             </details>
                         </div>
                     `
@@ -563,15 +589,14 @@ Remaining: 2,166 @ 20% = 433
                 data: data,
                 links: links,
                 roam: true,
-                draggable: true,
                 zoom: 0.85,
                 label: {
                     show: true, position: 'bottom', color: '#7f8c8d', fontSize: 11, fontWeight: 'bold', formatter: '{b}',
                     distance: 8
                 },
                 itemStyle: { borderColor: '#fff', borderWidth: 2 },
-                lineStyle: { color: '#dcdcdc', width: 1.5, curveness: 0.2 },
-                force: { repulsion: 400, edgeLength: 90, gravity: 0.05 }
+                lineStyle: { color: '#dcdcdc', width: 1.5, curveness: 0.2, opacity: 0.8 },
+                force: { repulsion: 500, edgeLength: 100, gravity: 0.06 }
             }]
         };
 
@@ -597,7 +622,7 @@ Remaining: 2,166 @ 20% = 433
 
             let html = '';
             if (info.html) {
-                html = info.html; // 直接使用预定义好的 HTML 内容
+                html = info.html;
             }
 
             contentDom.innerHTML = html;
