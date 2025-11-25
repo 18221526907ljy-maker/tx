@@ -3,461 +3,517 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ACCA TX (UK) FA2024 Examiner's Review</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <title>ACCA TX (UK) FA2024 终极讲义图谱</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
     <style>
-        /* === 移动端底层优化 === */
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { 
-            margin: 0; padding: 0; overflow: hidden; 
-            background-color: #f4f1ea; /* 护眼羊皮纸色 */
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-        }
-        
-        /* 强制容器高度，防止空白 */
-        #main { width: 100vw; height: 100vh; display: block; }
-        
-        /* 加载提示 */
-        #loading {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            color: #999; font-size: 14px; pointer-events: none; transition: opacity 0.5s;
+        /* === 移动端沉浸式排版 === */
+        :root {
+            --bg-color: #f7f5f0; /* 莫兰迪米白 */
+            --card-bg: #ffffff;
+            --text-main: #2c3e50;
+            --text-sub: #7f8c8d;
+            --accent-it: #ffb7b2; /* Income Tax */
+            --accent-ct: #a8d8ea; /* Corp Tax */
+            --accent-cgt: #aa96da; /* CGT */
+            --accent-iht: #95e1d3; /* IHT */
+            --accent-vat: #ffeaa7; /* VAT */
         }
 
-        /* 顶部栏 */
+        body { margin: 0; padding: 0; overflow: hidden; background-color: var(--bg-color); font-family: -apple-system, "PingFang SC", sans-serif; -webkit-tap-highlight-color: transparent; }
+        #main { width: 100vw; height: 100vh; }
+
+        /* 顶部导航 */
         .header {
-            position: absolute; top: 0; left: 0; right: 0; z-index: 50;
-            padding: 12px 16px; background: rgba(244, 241, 234, 0.95);
-            border-bottom: 1px solid rgba(0,0,0,0.05);
+            position: absolute; top: 0; left: 0; right: 0; z-index: 10;
+            padding: 15px 20px; background: rgba(247, 245, 240, 0.9);
+            backdrop-filter: blur(10px); border-bottom: 1px solid rgba(0,0,0,0.05);
             display: flex; justify-content: space-between; align-items: center;
         }
-        .header h1 { font-size: 16px; color: #2c3e50; margin: 0; font-weight: 800; }
-        .badge { background: #e74c3c; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; }
+        .header h1 { margin: 0; font-size: 18px; color: var(--text-main); font-weight: 800; letter-spacing: -0.5px; }
+        .header .badge { background: #2d3436; color: #fff; padding: 3px 8px; border-radius: 6px; font-size: 10px; font-weight: 600; }
 
-        /* 底部弹窗 (Bottom Sheet) */
-        .sheet-mask {
+        /* 底部详情卡片 (Bottom Sheet) */
+        .sheet-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.4); z-index: 90; display: none;
-            backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+            background: rgba(0,0,0,0.3); z-index: 99; display: none;
+            backdrop-filter: blur(4px); transition: opacity 0.3s;
         }
-        .sheet-mask.show { display: block; animation: fadeIn 0.2s; }
+        .sheet-overlay.active { display: block; animation: fadeIn 0.3s; }
 
-        .sheet-container {
+        .sheet {
             position: fixed; bottom: 0; left: 0; right: 0;
-            background: #fff; z-index: 100;
-            border-top-left-radius: 20px; border-top-right-radius: 20px;
-            box-shadow: 0 -5px 30px rgba(0,0,0,0.1);
-            transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-            display: flex; flex-direction: column; max-height: 85vh;
+            background: var(--card-bg); border-radius: 24px 24px 0 0;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.15); z-index: 100;
+            height: 85vh; display: flex; flex-direction: column;
+            transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .sheet-container.show { transform: translateY(0); }
+        .sheet.active { transform: translateY(0); }
 
-        /* 弹窗内容 */
-        .sheet-head { 
-            padding: 15px 20px; border-bottom: 1px solid #eee; 
-            display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;
+        /* 卡片头部与内容 */
+        .sheet-header { 
+            padding: 20px 25px; border-bottom: 1px solid #f0f0f0; 
+            display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; 
         }
-        .sheet-title { font-size: 18px; font-weight: 800; color: #34495e; margin: 0; }
-        .close-icon { font-size: 24px; color: #95a5a6; padding: 5px; cursor: pointer; }
+        .sheet-tag { font-size: 10px; font-weight: 800; letter-spacing: 1px; padding: 4px 8px; border-radius: 4px; color: #fff; margin-bottom: 5px; display: inline-block; }
+        .sheet-title { margin: 0; font-size: 22px; font-weight: 700; color: var(--text-main); }
+        .close-btn { width: 32px; height: 32px; background: #f5f6fa; border-radius: 50%; text-align: center; line-height: 32px; color: #b2bec3; font-size: 20px; }
 
-        .sheet-body { 
-            padding: 20px; overflow-y: auto; -webkit-overflow-scrolling: touch; 
-            background: #fff; 
-        }
+        .sheet-body { padding: 25px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 
-        /* 知识点模块样式 */
-        .k-block { margin-bottom: 20px; }
-        .k-label { 
-            display: inline-block; font-size: 11px; font-weight: 800; color: #fff; 
-            padding: 4px 8px; border-radius: 4px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;
+        /* 内容排版样式 (讲义风格) */
+        .lecture-block { margin-bottom: 30px; }
+        .lecture-title { 
+            font-size: 15px; font-weight: 800; color: var(--text-main); 
+            border-left: 4px solid; padding-left: 10px; margin-bottom: 15px; 
+            display: flex; align-items: center;
         }
+        .text-content { font-size: 14px; line-height: 1.7; color: #555; text-align: justify; }
+        .text-content li { margin-bottom: 8px; }
+        .text-content strong { color: #2c3e50; font-weight: 700; }
         
-        /* 颜色定义 */
-        .bg-def { background: #95a5a6; }
-        .bg-rule { background: #3498db; }
-        .bg-exam { background: #e67e22; } /* 考官重点 */
-        .bg-trap { background: #e74c3c; }
+        /* 重点高亮 */
+        .highlight { background: #fff3cd; padding: 0 4px; border-radius: 4px; color: #856404; font-weight: bold; }
+        .rate-badge { background: #e8f5e9; color: #2e7d32; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-weight: bold; }
 
-        .k-content { font-size: 14px; line-height: 1.6; color: #2c3e50; text-align: justify; }
-        
-        /* 题目容器 */
-        .q-box {
-            border: 1px solid #eee; border-radius: 8px; padding: 15px; margin-top: 5px;
-            background: #fdfdfd; box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-        }
-        .q-scenario { font-style: italic; color: #555; margin-bottom: 10px; border-left: 3px solid #ccc; padding-left: 10px; }
+        /* 综合题样式 */
+        .exam-box { border: 1px solid #eee; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.03); margin-top: 10px; }
+        .exam-header { background: #fdf0ed; padding: 12px 20px; border-bottom: 1px solid #fae3de; font-weight: 700; color: #c0392b; font-size: 14px; }
+        .exam-body { padding: 20px; background: #fff; font-size: 14px; line-height: 1.6; color: #333; }
         
         /* 折叠解析 */
-        details { margin-top: 10px; border-top: 1px dashed #eee; padding-top: 10px; }
-        summary { font-size: 13px; font-weight: 700; color: #2980b9; cursor: pointer; list-style: none; display: flex; justify-content: space-between; }
-        summary::-webkit-details-marker { display: none; }
-        summary::after { content: '+ 解析'; }
-        details[open] summary::after { content: '- 收起'; }
+        details { margin-top: 15px; border-top: 1px dashed #ddd; padding-top: 15px; }
+        summary { font-size: 14px; font-weight: 700; color: #2980b9; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
+        summary::after { content: '查看解析 ▼'; font-size: 12px; color: #95a5a6; }
+        details[open] summary::after { content: '收起 ▲'; }
         
-        .answer-area {
-            background: #f4faff; padding: 12px; border-radius: 6px; margin-top: 10px;
-            font-family: "Menlo", monospace; font-size: 13px; color: #2c3e50; border: 1px solid #d6eaf8;
-        }
-        .marker-note {
-            margin-top: 10px; background: #fff5f5; padding: 10px; border-radius: 6px;
-            color: #c0392b; font-size: 12px; font-weight: 600; border: 1px solid #fadbd8;
-        }
+        .solution-area { background: #f4faff; padding: 15px; border-radius: 8px; margin-top: 15px; font-family: 'Menlo', monospace; font-size: 13px; color: #2c3e50; border: 1px solid #d6eaf8; white-space: pre-wrap; }
+        .lecturer-note { margin-top: 12px; padding: 12px; background: #fff8e1; border-radius: 6px; color: #d35400; font-size: 13px; font-style: italic; border: 1px solid #ffe0b2; }
 
         @keyframes fadeIn { from {opacity:0} to {opacity:1} }
     </style>
 </head>
 <body>
 
-    <div id="loading">正在加载图谱数据...</div>
-
     <div class="header">
         <h1>TX (UK) Master Guide</h1>
-        <span class="badge">FA2024</span>
+        <span class="badge">FA2024 | 25/26</span>
     </div>
 
     <div id="main"></div>
 
-    <div class="sheet-mask" id="mask" onclick="closeSheet()"></div>
-    <div class="sheet-container" id="sheet">
-        <div class="sheet-head">
-            <h2 class="sheet-title" id="sheetTitle">知识点</h2>
-            <div class="close-icon" onclick="closeSheet()">×</div>
+    <div class="sheet-overlay" id="overlay" onclick="closeSheet()"></div>
+    <div class="sheet" id="sheet">
+        <div class="sheet-header">
+            <div>
+                <span class="sheet-tag" id="sheetTag">CATEGORY</span>
+                <h2 class="sheet-title" id="sheetTitle">Title</h2>
+            </div>
+            <div class="close-btn" onclick="closeSheet()">×</div>
         </div>
         <div class="sheet-body" id="sheetContent">
             </div>
     </div>
 
     <script type="text/javascript">
-        // 确保 DOM 加载完毕
-        window.onload = function() {
-            document.getElementById('loading').style.opacity = 0;
-            initChart();
-        };
+        var chartDom = document.getElementById('main');
+        var myChart = echarts.init(chartDom);
 
-        function initChart() {
-            var chartDom = document.getElementById('main');
-            var myChart = echarts.init(chartDom);
-
-            // ================= 考官级内容库 (FA2024 修正版) =================
-            
-            const data = [
-                {
-                    id: 'root', name: 'UK TAX\nSystem', category: 0, symbolSize: 80, color: '#34495e',
-                    info: {
-                        def: '英国税法体系核心 (FA 2024)',
-                        rule: '适用于 2025年6月 - 2026年3月 考季。',
-                        exam: '<b>Exam Focus:</b> 考试中税率表会提供，但你必须熟练运用，尤其是 Income Tax 的 Proforma 和 Corporation Tax 的税率分层。',
-                        trap: '务必使用 FA2024 新税率：NIC (8%/6%)，CGT (3k AEA)，VAT (90k)。旧资料全扔掉！'
-                    }
-                },
-                // --- IT ---
-                {
-                    id: '1', name: 'Income Tax\n综合计算', category: 1, symbolSize: 65, color: '#e5989b',
-                    info: {
-                        def: '个人所得税综合题是 Section C 的必考题 (15分)。',
-                        rule: '<b>Order:</b> Non-savings -> Savings -> Dividends.<br><b>PA:</b> £12,570 (ANI > £100k 时递减).<br><b>Rates:</b> 20% / 40% / 45%.',
-                        exam: '<b>Proforma 技巧:</b> 总是先列出三列 (NS, Sav, Div)。PA 优先抵扣 NS。Gift Aid 会扩展 Basic & Higher Bands。',
-                        question: `
-                            <div class="q-scenario">
-                                <b>Scenario:</b> Alice (23/24)<br>
-                                • Salary: £110,000<br>
-                                • Interest: £4,000<br>
-                                • Gift Aid Paid (Net): £4,000
-                            </div>
-                            <b>Task:</b> 计算 Income Tax Liability。
-                        `,
-                        answer: `
-                            1. <b>ANI Check (PA):</b><br>
-                            Net Income = 110k + 4k = 114,000<br>
-                            Gross Gift Aid = 4,000 * 100/80 = 5,000<br>
-                            ANI = 114,000 - 5,000 = <b>£109,000</b><br>
-                            PA Reduction = (109,000 - 100,000)/2 = £4,500<br>
-                            Available PA = 12,570 - 4,500 = <b>£8,070</b><br>
-                            <br>
-                            2. <b>Band Extension:</b><br>
-                            Basic Band = 37,700 + 5,000 = <b>£42,700</b><br>
-                            <br>
-                            3. <b>Tax Calc:</b><br>
-                            <b>Non-Savings (110k - 8,070 = 101,930):</b><br>
-                            42,700 @ 20% = 8,540<br>
-                            59,230 @ 40% = 23,692<br>
-                            <b>Savings (4,000):</b><br>
-                            PSA (Higher Rate) = £500<br>
-                            500 @ 0% = 0<br>
-                            3,500 @ 40% = 1,400<br>
-                            <br>
-                            <b>Total Liability = £33,632</b>
-                        `,
-                        trap: 'Marker‘s Note: 很多考生忘记算 ANI 导致的 PA 减少 。记住公式：ANI = Net Income - Gross Gift Aid - Gross Pension。'
-                    }
-                },
-                {
-                    id: '1.1', name: 'Employment\n& NIC', category: 1, symbolSize: 50, color: '#ffb4a2',
-                    info: {
-                        def: 'P11D 福利与社保。FA2024 NIC 费率大变。',
-                        rule: '<b>Class 1 (Emp):</b> <span style="color:red;font-weight:bold">8%</span> (£12,570-£50,270) <br><b>Car:</b> List Price × % (Base 55g=16%) [cite: 21]<br><b>Fuel:</b> £27,800 × % [cite: 26]',
-                        question: `
-                            <div class="q-scenario">
-                                <b>Scenario:</b> 公司提供汽油车 (List £20k, 100g/km) 给员工。公司支付所有油费，员工未偿还。<br>
-                                <b>Task:</b> 计算 Taxable Benefits。
-                            </div>
-                        `,
-                        answer: `
-                            1. <b>Car Benefit %:</b><br>
-                            (100 - 55) / 5 = 9%<br>
-                            Base 16% + 9% = <b>25%</b><br>
-                            <br>
-                            2. <b>Car Benefit:</b><br>
-                            £20,000 × 25% = <b>£5,000</b><br>
-                            <br>
-                            3. <b>Fuel Benefit:</b><br>
-                            £27,800 × 25% = <b>£6,950</b>
-                        `,
-                        trap: '注意：Class 1 NIC 已经降为 8%！如果用旧的 12% 算会直接扣分。另外，Electric Car 是 2% [cite: 22]。'
-                    }
-                },
-                
-                // --- CT ---
-                {
-                    id: '2', name: 'Corp Tax\n公司税', category: 2, symbolSize: 65, color: '#a0c4ff',
-                    info: {
-                        def: 'TTP (Taxable Total Profits) 与 Augmented Profits (AP)。',
-                        rule: 'Lower £50k (19%) - Upper £250k (25%) [cite: 48]<br>Marginal Relief = (U - AP) × 3/200 × (TTP/AP) ',
-                        question: `
-                            <div class="q-scenario">
-                                <b>Scenario:</b> B Ltd<br>
-                                • Trading Profit: £190,000<br>
-                                • Dividends Received (FII): £10,000<br>
-                                • 无关联公司 (Associated Companies)
-                            </div>
-                            <b>Task:</b> 计算 CT Liability。
-                        `,
-                        answer: `
-                            1. <b>TTP:</b> £190,000 (股息不进 TTP)<br>
-                            <br>
-                            2. <b>Augmented Profits (AP):</b><br>
-                            190,000 + 10,000 = <b>£200,000</b><br>
-                            (用于确定税率：在 50k-250k 之间)<br>
-                            <br>
-                            3. <b>Calculation:</b><br>
-                            CT @ 25%: 190,000 × 25% = 47,500<br>
-                            Less Marginal Relief:<br>
-                            (250,000 - 200,000) × 3/200 × (190k/200k)<br>
-                            = 50,000 × 0.015 × 0.95 = (712.5)<br>
-                            <br>
-                            <b>Tax Payable = £46,787.5</b>
-                        `,
-                        trap: '关键陷阱：Dividends Received (FII) 不交税，但必须加回计算 AP 以挤压你的 Marginal Relief 空间！'
-                    }
-                },
-                {
-                    id: '2.1', name: 'Capital\nAllowances', category: 2, symbolSize: 50, color: '#bde0fe',
-                    info: {
-                        def: '资本减免 (税务折旧)。',
-                        rule: '<b>Full Expensing:</b> New Main Pool -> 100% FYA <br><b>AIA:</b> £1,000,000 <br><b>SRP:</b> 50% FYA + 6% WDA ',
-                        question: `
-                            <div class="q-scenario">
-                                <b>Scenario:</b> 公司购买：<br>
-                                1. 全新机器 (Main Pool): £1.5m<br>
-                                2. 二手机器 (Main Pool): £200k
-                            </div>
-                        `,
-                        answer: `
-                            1. <b>New Machine (£1.5m):</b><br>
-                            Full Expensing -> 100% Allowable (£1.5m)<br>
-                            (不占用 AIA)<br>
-                            <br>
-                            2. <b>Second-hand (£200k):</b><br>
-                            不适用 Full Expensing。<br>
-                            使用 AIA -> 100% Allowable (£200k)<br>
-                            <br>
-                            <b>Total Allowances = £1,700,000</b>
-                        `,
-                        trap: 'Full Expensing 只适用于**全新**的主池资产。二手资产必须走 AIA 或 WDA。'
-                    }
-                },
-
-                // --- CGT ---
-                {
-                    id: '3', name: 'CGT\n资本利得', category: 3, symbolSize: 65, color: '#caffbf',
-                    info: {
-                        def: '个人资产处置收益税。',
-                        rule: '<b>AEA:</b> £3,000 <br><b>Resi Rate:</b> 18% / <span style="color:red;font-weight:bold">24%</span> (FA24降税) <br><b>Other:</b> 10% / 20% ',
-                        question: `
-                            <div class="q-scenario">
-                                <b>Scenario:</b> 高税率纳税人出售：<br>
-                                1. 住宅 (Residential Gain): £10,000<br>
-                                2. 股票 (Other Gain): £5,000
-                            </div>
-                            <b>Task:</b> 优化计算 CGT。
-                        `,
-                        answer: `
-                            <b>Principle:</b> AEA 优先抵扣高税率资产。<br>
-                            <br>
-                            1. <b>Residential (£10k):</b><br>
-                            抵扣 AEA (£3,000)<br>
-                            Taxable: £7,000 @ <b>24%</b> = £1,680<br>
-                            (注：FA24 住宅高税率是 24% 不是 28%)<br>
-                            <br>
-                            2. <b>Shares (£5k):</b><br>
-                            Taxable: £5,000 @ 20% = £1,000<br>
-                            <br>
-                            <b>Total CGT = £2,680</b>
-                        `,
-                        trap: '考生常犯错误：1. 使用旧的 AEA (£6k)。2. 使用旧的住宅税率 (28%)。FA24 中这两个都变了！'
-                    }
-                },
-                {
-                    id: '3.1', name: 'BADR\n商业资产', category: 3, symbolSize: 50, color: '#fdffb6',
-                    info: {
-                        def: 'Business Asset Disposal Relief (10% 税率)。',
-                        rule: '<b>Rate:</b> 10% [cite: 78]<br><b>Lifetime Limit:</b> £1 million [cite: 78]',
-                        exam: '必须持有 2 年以上。如果是股份，需满足 5% 持股 + 员工身份。',
-                        question: `
-                            <div class="q-scenario">
-                                <b>Scenario:</b> 出售个人公司获利 £1.2m。符合 BADR 条件。无其他收益。
-                            </div>
-                        `,
-                        answer: `
-                            <b>1. BADR Portion (Max £1m):</b><br>
-                            £1,000,000 @ 10% = £100,000<br>
-                            <br>
-                            <b>2. Remaining (£200k):</b><br>
-                            (200,000 - 3,000 AEA) = 197,000<br>
-                            按普通税率 (假设高税率):<br>
-                            197,000 @ 20% = £39,400<br>
-                            <br>
-                            <b>Total = £139,400</b>
-                        `,
-                        trap: 'BADR 的 £1m 是终身限额。题目如果说“之前已经用了 £400k”，那这次就只剩 £600k 额度了。'
-                    }
-                },
-
-                // --- IHT ---
-                {
-                    id: '4', name: 'IHT\n遗产税', category: 4, symbolSize: 65, color: '#bdb2ff',
-                    info: {
-                        def: '7年原则与死亡税计算。',
-                        rule: '<b>NRB:</b> £325,000 [cite: 63]<br><b>RNRB:</b> £175,000 [cite: 63]<br><b>Death Rate:</b> 40% [cite: 63]',
-                        question: `
-                            <div class="q-scenario">
-                                <b>Scenario:</b> 2024年去世。Estate £600k (含自住房 £300k)。<br>
-                                房子留给儿子。生前无赠与。
-                            </div>
-                            <b>Task:</b> 计算 IHT。
-                        `,
-                        answer: `
-                            1. <b>Exemptions:</b><br>
-                            NRB = £325,000<br>
-                            RNRB = £175,000 (适用，留给直系)<br>
-                            Total Exempt = £500,000<br>
-                            <br>
-                            2. <b>Taxable:</b><br>
-                            600,000 - 500,000 = £100,000<br>
-                            <br>
-                            3. <b>Tax:</b><br>
-                            100,000 @ 40% = <b>£40,000</b>
-                        `,
-                        trap: 'RNRB 只有在房子留给 Direct Descendant (子女/孙子女) 时才适用。留给兄弟姐妹或侄子是不行的！'
-                    }
-                },
-
-                // --- VAT ---
-                {
-                    id: '5', name: 'VAT\n增值税', category: 5, symbolSize: 60, color: '#ffc6ff',
-                    info: {
-                        def: '注册与销项税计算。',
-                        rule: '<b>Registration:</b> >£90,000 (Historical/Future) <br><b>Deregistration:</b> <£88,000 ',
-                        question: `
-                            <div class="q-scenario">
-                                <b>Scenario:</b> 售价 £100 (Net)。提供 5% PPD。客户实际付款 £95。
-                            </div>
-                            <b>Task:</b> 计算 Output VAT。
-                        `,
-                        answer: `
-                            <b>Rule:</b> 基于实际付款额 (Actual Consideration)。<br>
-                            <br>
-                            VAT = £95 × 20% = <b>£19</b><br>
-                            <br>
-                            (如果客户没拿折扣付了 £100，VAT 就是 £20)
-                        `,
-                        trap: '注册门槛 FA24 涨到了 £90,000！别用旧的 85k。另外 PPD 计算规则也是近年改的，一定要按实际收到的钱算税。'
-                    }
+        // ================= 核心内容库 (FA2024) =================
+        const dataPoints = [
+            {
+                id: 'root', name: 'UK TAX SYSTEM', category: 'System', color: '#34495e', symbolSize: 90,
+                content: {
+                    intro: 'FA2024 核心变化摘要 (适用于 25/26 考季)',
+                    sections: [
+                        { title: '1. NIC 费率巨变', content: 'Class 1 Employee 降至 <b>8%</b> (原10/12%)。<br>Class 4 Self-Employed 降至 <b>6%</b> (原9%)。' },
+                        { title: '2. CGT 紧缩', content: '年度免税额 (AEA) 仅剩 <b>£3,000</b>。<br>住宅房产高税率降至 <b>24%</b> (原28%)。' },
+                        { title: '3. VAT 门槛', content: '注册门槛上调至 <b>£90,000</b>。<br>注销门槛上调至 <b>£88,000</b>。' }
+                    ]
                 }
-            ];
+            },
+            // ================= 1. Income Tax =================
+            {
+                id: 'it', name: 'Income Tax\n个人所得税', category: 'IT', color: '#ffaaa5', symbolSize: 75,
+                content: {
+                    tagColor: '#ffaaa5',
+                    intro: '对个人纳税年度内的全球收入征税。逻辑必须线性：区分收入类型 -> 扣除减免 -> 确认税率。',
+                    sections: [
+                        {
+                            title: '1. 核心概念与税率 (Basic Principles)',
+                            content: `
+                                <ul>
+                                    [cite_start]<li><b>征税顺序 (Order):</b> 1. Non-Savings (NS) -> 2. Savings (Sav) -> 3. Dividends (Div)。[cite: 366, 367, 376]</li>
+                                    [cite_start]<li><b>个人免税额 (PA):</b> <span class="rate-badge">£12,570</span>。但当 ANI > £100k 时，每£2收入减少£1 PA。[cite: 391, 397]</li>
+                                    <li><b>税率 (Rates):</b>
+                                        <br>- Non-Savings: 20% / 40% / 45%
+                                        [cite_start]<br>- Dividends: 8.75% / 33.75% / 39.35% [cite: 379]
+                                    </li>
+                                </ul>`
+                        },
+                        {
+                            title: '2. 雇佣与社保 (Employment & NIC)',
+                            content: `
+                                <ul>
+                                    [cite_start]<li><b>用车福利 (Car Benefit):</b> List Price × % (Base 55g=16%, Max 37%)。[cite: 17, 182]</li>
+                                    <li><b>NIC (FA24 重点):</b>
+                                        [cite_start]<br>- Class 1 (Emp): £12,570-£50,270 @ <span class="highlight">8%</span> [cite: 82]
+                                        [cite_start]<br>- Class 4 (Self): 同区间 @ <span class="highlight">6%</span> [cite: 82]
+                                    </li>
+                                </ul>`
+                        },
+                        {
+                            title: '3. 计算模板 (Proforma)',
+                            content: `
+                                Net Income = Total Income - Reliefs (Interest)<br>
+                                Less: PA (adjusted for ANI)<br>
+                                = Taxable Income<br>
+                                <b>Extension:</b> Gift Aid & Pension 会扩展 Basic & Higher Rate Bands。`
+                        },
+                        {
+                            title: '4. 综合大题 (Master Question)',
+                            isQuestion: true,
+                            q: `<b>Scenario:</b> Alice (23/24)<br>• Salary: £110,000 (PAYE £25k)<br>• Dividends: £5,000<br>• Gift Aid Paid (Net): £4,000<br><br><b>Requirement:</b> 计算 Alice 的应补缴税款 (Income Tax Payable)。`,
+                            a: `<b>Step 1: ANI Check (PA Reduction)</b>
+Net Income = 110,000 + 5,000 = £115,000
+Gross Gift Aid = 4,000 × 100/80 = £5,000
+ANI = 115,000 - 5,000 = £110,000
 
-            // 连线
-            const links = [
-                { source: 'root', target: '1' }, { source: '1', target: '1.1' },
-                { source: 'root', target: '2' }, { source: '2', target: '2.1' }, { source: '2', target: '2.2' },
-                { source: 'root', target: '3' }, { source: '3', target: '3.1' },
-                { source: 'root', target: '4' },
-                { source: 'root', target: '5' }
-            ];
+PA Reduction = (110,000 - 100,000) / 2 = £5,000
+Available PA = 12,570 - 5,000 = <b>£7,570</b>
 
-            // 配置
-            const option = {
-                backgroundColor: '#f4f1ea',
-                series: [{
+<b>Step 2: Band Extension</b>
+Basic Band = 37,700 + 5,000 = <b>£42,700</b>
+Higher Band starts at £42,701 up to (125,140 + 5,000) = £130,140
+
+<b>Step 3: Computation</b>
+Non-Savings (Salary): £110,000 - £7,570 = £102,430
+- Basic: 42,700 @ 20% = 8,540
+- Higher: (102,430 - 42,700) = 59,730 @ 40% = 23,892
+(Total NS Tax = 32,432)
+
+Dividends (£5,000):
+- Nil Rate: £500 @ 0% = 0 (FA24 Limit)
+- Higher: 4,500 @ 33.75% = 1,518.75
+
+<b>Total Liability:</b> 32,432 + 1,518.75 = £33,950.75
+Less PAYE: (25,000)
+<b>Tax Payable: £8,950.75</b>`,
+                            note: '易错点：1. 股息免税额 FA24 降为 £500。2. 计算 ANI 时要减去 Gross Gift Aid。3. 税率带扩展用的是 Gross Gift Aid。'
+                        }
+                    ]
+                }
+            },
+            // ================= 2. Corporation Tax =================
+            {
+                id: 'ct', name: 'Corp Tax\n公司税', category: 'CT', color: '#a8d8ea', symbolSize: 75,
+                content: {
+                    tagColor: '#a8d8ea',
+                    intro: '公司对其会计期间内的应税总利润 (TTP) 缴税。',
+                    sections: [
+                        {
+                            title: '1. 核心税率 (Tax Rates)',
+                            content: `
+                                <ul>
+                                    [cite_start]<li><b>Lower Limit (£50k):</b> <span class="rate-badge">19%</span> (Small Profits Rate) [cite: 48]</li>
+                                    [cite_start]<li><b>Upper Limit (£250k):</b> <span class="rate-badge">25%</span> (Main Rate) [cite: 48]</li>
+                                    <li><b>Marginal Relief:</b> 当利润在两者之间时适用。
+                                        [cite_start]<br>公式: <span class="highlight">(U - A) × 3/200</span> [cite: 49]
+                                    </li>
+                                    <li><b>Augmented Profits (AP):</b> TTP + Franked Investment Income (FGL - Dividends from non-group companies)。AP 用来确定税率区间。</li>
+                                </ul>`
+                        },
+                        {
+                            title: '2. 资本减免 (Capital Allowances)',
+                            content: `
+                                <ul>
+                                    [cite_start]<li><b>Full Expensing (FA24):</b> 全新、未使用的主池资产 (Main Pool) 享受 <b>100% FYA</b>。无金额上限。[cite: 45]</li>
+                                    [cite_start]<li><b>AIA:</b> £1,000,000。用于二手资产或 SRP 资产。[cite: 45]</li>
+                                    [cite_start]<li><b>SRP (Special Rate Pool):</b> 全新资产 50% FYA，余额 6% WDA。[cite: 45]</li>
+                                </ul>`
+                        },
+                        {
+                            title: '3. 亏损抵扣 (Losses)',
+                            content: `顺序：1. [cite_start]Current Year (全部) -> 2. Carry Back (12个月，全部) -> 3. Carry Forward (未来，灵活抵扣，可保留 QCD)。[cite: 916]`
+                        },
+                        {
+                            title: '4. 综合大题 (Master Question)',
+                            isQuestion: true,
+                            q: `<b>Scenario:</b> C Ltd (无关联公司) 业绩：<br>• Trading Profit (adj): £190,000<br>• Bank Interest: £5,000<br>• Dividends Received (FGL): £20,000<br>• Bought New Machinery: £100,000 (Main Pool)<br><br><b>Requirement:</b> 计算 Corporation Tax。`,
+                            a: `<b>Step 1: TTP Calculation</b>
+Adjusted Trading Profit: 190,000
+Less: Capital Allowances (Full Expensing): (100,000)
+Trading Income: 90,000
+Add: Interest: 5,000
+<b>TTP = £95,000</b>
+
+<b>Step 2: Determine Rate (Augmented Profits)</b>
+AP = TTP + Dividends
+AP = 95,000 + 20,000 = <b>£115,000</b>
+(Range: £50k - £250k -> Marginal Relief applies)
+
+<b>Step 3: Tax Calculation</b>
+Basic Tax: 95,000 (TTP) × 25% = 23,750
+Less Marginal Relief:
+(250,000 - 115,000) × 3/200 × (95,000/115,000)
+= 135,000 × 0.015 × 0.826...
+= (1,672.83)
+
+<b>Tax Liability = £22,077.17</b>`,
+                            note: '股息不交税 (Excluded from TTP)，但必须加回算 AP 以挤压低税率空间。Capital Allowances 注意 Full Expensing 直接 100% 抵扣。'
+                        }
+                    ]
+                }
+            },
+            // ================= 3. CGT =================
+            {
+                id: 'cgt', name: 'CGT\n资本利得', category: 'CGT', color: '#aa96da', symbolSize: 75,
+                content: {
+                    tagColor: '#aa96da',
+                    intro: '个人或公司处置资产的收益。重点在于 FA24 的税率和免税额变化。',
+                    sections: [
+                        {
+                            title: '1. 核心参数 (Individuals)',
+                            content: `
+                                <ul>
+                                    [cite_start]<li><b>AEA (免税额):</b> <span class="highlight">£3,000</span> (FA24 减半)。[cite: 74]</li>
+                                    <li><b>税率 (Rates):</b>
+                                        <br>- 普通资产: 10% (Basic) / 20% (Higher)
+                                        [cite_start]<br>- 住宅房产: 18% (Basic) / <span class="highlight">24%</span> (Higher - FA24新规)。[cite: 74]
+                                    </li>
+                                </ul>`
+                        },
+                        {
+                            title: '2. 商业资产优惠 (BADR)',
+                            content: `
+                                <ul>
+                                    <li><b>定义:</b> Business Asset Disposal Relief (原企业家减免)。</li>
+                                    [cite_start]<li><b>税率:</b> 10% (终身限额 £1m)。[cite: 78]</li>
+                                    <li><b>条件:</b> 持有并经营业务 2 年以上；股份需 5% 持股 + 员工身份。</li>
+                                </ul>`
+                        },
+                        {
+                            title: '3. 综合大题 (Master Question)',
+                            isQuestion: true,
+                            q: `<b>Scenario:</b> 高税率纳税人出售两项资产：<br>1. 投资房产 (Residential): Gain £20,000<br>2. 股票 (Shares): Gain £5,000<br><br><b>Requirement:</b> 计算 23/24 CGT (假设未用 AEA)。`,
+                            a: `<b>Strategy:</b> 总是把 AEA (£3,000) 分配给税率最高的收益。
+
+<b>1. Residential Property (£20k):</b>
+Less: AEA (£3,000) -> 优先抵扣 24% 税率部分
+Taxable = £17,000
+Tax = 17,000 × <b>24%</b> = £4,080
+(注: FA24 住宅高税率是 24%，不再是 28%)
+
+<b>2. Shares (£5k):</b>
+Taxable = £5,000
+Tax = 5,000 × 20% = £1,000
+
+<b>Total CGT = £5,080</b>`,
+                            note: '一定要记住住宅税率降到了 24%！AEA 只有 £3,000！'
+                        }
+                    ]
+                }
+            },
+            // ================= 4. IHT =================
+            {
+                id: 'iht', name: 'IHT\n遗产税', category: 'IHT', color: '#95e1d3', symbolSize: 75,
+                content: {
+                    tagColor: '#95e1d3',
+                    intro: '按生前转移 -> 死后追加 -> 死亡遗产的时间轴记忆。',
+                    sections: [
+                        {
+                            title: '1. 核心税率 (Basic Principles)',
+                            content: `
+                                <ul>
+                                    [cite_start]<li><b>NRB (零税率带):</b> £325,000。[cite: 63]</li>
+                                    [cite_start]<li><b>RNRB (居住零税率带):</b> £175,000 (需留给直系后代)。[cite: 63]</li>
+                                    <li><b>税率:</b> 死亡时 40% / 生前 CLT 20%。</li>
+                                </ul>`
+                        },
+                        {
+                            title: '2. 生前转移 (Lifetime Transfers)',
+                            content: `
+                                <ul>
+                                    [cite_start]<li><b>PET (给个人):</b> 赠与时无税。活过 7 年免税。死在 7 年内变为 Chargeable。[cite: 1401]</li>
+                                    [cite_start]<li><b>CLT (给信托):</b> 立即征收 20% (超出 NRB 部分)。死在 7 年内重算。[cite: 1401]</li>
+                                    [cite_start]<li><b>豁免:</b> 每年 £3,000 (可结转1年)，小额 £250，婚庆礼物等。[cite: 1400]</li>
+                                </ul>`
+                        },
+                        {
+                            title: '3. 计算模板 (Proforma)',
+                            content: `Step 1: Lifetime Tax (CLT only)<br>Step 2: Death Tax on Lifetime Gifts (7年内)<br>Step 3: Death Estate (总资产 - 债务 - 豁免)`
+                        },
+                        {
+                            title: '4. 综合大题 (Master Question)',
+                            isQuestion: true,
+                            q: `<b>Scenario:</b> John 2024年去世。Estate £900k (含自住房 £400k)。<br>• 生前 2020年 给信托 (CLT) £200k。<br>• 房子留给儿子。<br>• 2020年 CLT 时 NRB 完整。<br><b>Requirement:</b> 计算死亡时的 IHT。`,
+                            a: `<b>Step 1: Check Lifetime Tax (Death Tax on CLT)</b>
+Gift (2020): £200,000
+Less AE (20/21 & 19/20): (6,000)
+Value: £194,000 (Covered by NRB £325k, Tax = 0)
+NRB Used = £194,000
+
+<b>Step 2: Death Estate</b>
+Total Estate: £900,000
+Less Exemptions: 0
+Chargeable Estate: £900,000
+
+<b>Step 3: Calculate Tax</b>
+Available NRB = 325,000 - 194,000 (Used by CLT) = £131,000
+Available RNRB = £175,000 (留给儿子，适用)
+Total Tax Free = 131,000 + 175,000 = £306,000
+
+Taxable = 900,000 - 306,000 = £594,000
+<b>IHT = 594,000 × 40% = £237,600</b>`,
+                            note: '生前 7 年内的 CLT 会吞噬死亡时的 NRB。千万别忘了把 CLT 用掉的额度扣除。'
+                        }
+                    ]
+                }
+            },
+            // ================= 5. VAT =================
+            {
+                id: 'vat', name: 'VAT\n增值税', category: 'VAT', color: '#ffeaa7', symbolSize: 75,
+                content: {
+                    tagColor: '#ffeaa7',
+                    intro: '注册、注销与计算。注意 PPD 折扣规则。',
+                    sections: [
+                        {
+                            title: '1. 注册门槛 (FA24 Updated)',
+                            content: `
+                                <ul>
+                                    [cite_start]<li><b>注册 (Registration):</b> 过去 12 个月 > <span class="highlight">£90,000</span>。[cite: 67]</li>
+                                    [cite_start]<li><b>注销 (Deregistration):</b> 未来 12 个月 < <span class="highlight">£88,000</span>。[cite: 68]</li>
+                                    <li><b>Flat Rate Scheme:</b> 加入 <£150k，退出 >£230k。</li>
+                                </ul>`
+                        },
+                        {
+                            title: '2. 综合大题 (Master Question)',
+                            isQuestion: true,
+                            q: `<b>Scenario:</b><br>1. 销售商品 £2,000 (Net)，提供 3% PPD。客户付款了并享受了折扣。<br>2. 购买车用于 50% 私用，车价 £24,000 (含 VAT)。<br><b>Requirement:</b> 计算 Output VAT 和可抵扣的 Input VAT。`,
+                            a: `<b>1. Output VAT (PPD Rule)</b>
+VAT 基于实际收到金额。
+Discounted Price = 2,000 × 97% = £1,940
+Output VAT = 1,940 × 20% = <b>£388</b>
+
+<b>2. Input VAT (Car Rule)</b>
+车如果有私用，Input VAT <b>100% 不可抵扣</b> (Blocked)。
+Input VAT Claimable = <b>£0</b>
+
+(注意：如果是修车费/油费，且有私用，那是可以部分抵扣或通过 Fuel Scale Charge 处理的，但买车本身不行)`,
+                            note: 'PPD 规则：收多少钱，交多少税。买车进项税：只要有一点私用，全额不可抵扣 (除非是出租车或驾校车)。'
+                        }
+                    ]
+                }
+            }
+        ];
+
+        // 连线关系 (环绕布局)
+        const links = [
+            { source: 'root', target: 'it' },
+            { source: 'root', target: 'ct' },
+            { source: 'root', target: 'cgt' },
+            { source: 'root', target: 'iht' },
+            { source: 'root', target: 'vat' }
+        ];
+
+        // ECharts 配置
+        const option = {
+            backgroundColor: '#f7f5f0',
+            tooltip: { show: false }, // 禁用默认提示框，使用自定义弹窗
+            series: [
+                {
                     type: 'graph',
                     layout: 'force',
-                    data: data,
+                    data: dataPoints,
                     links: links,
                     roam: true,
-                    label: { show: true, position: 'bottom', color: '#555', fontSize: 11, fontWeight: 'bold' },
-                    itemStyle: { borderColor: '#fff', borderWidth: 2, shadowBlur: 5, shadowColor: 'rgba(0,0,0,0.2)' },
-                    lineStyle: { color: '#bbb', curveness: 0.1, width: 1.5 },
-                    force: { repulsion: 350, edgeLength: 90, gravity: 0.08 }
-                }]
-            };
+                    draggable: true,
+                    zoom: 0.9,
+                    label: {
+                        show: true,
+                        position: 'bottom',
+                        formatter: '{b}',
+                        color: '#636e72',
+                        fontSize: 11,
+                        fontWeight: 'bold'
+                    },
+                    itemStyle: {
+                        borderColor: '#fff',
+                        borderWidth: 3,
+                        shadowBlur: 10,
+                        shadowColor: 'rgba(0,0,0,0.1)'
+                    },
+                    lineStyle: {
+                        color: '#bdc3c7',
+                        width: 1.5,
+                        curveness: 0.1
+                    },
+                    force: {
+                        repulsion: 450,
+                        edgeLength: 110,
+                        gravity: 0.08
+                    }
+                }
+            ]
+        };
 
-            myChart.setOption(option);
-            
-            // 点击交互
-            myChart.on('click', function(params) {
-                if (params.data.info) showSheet(params.data);
-            });
-        }
+        myChart.setOption(option);
+        window.addEventListener('resize', function() { myChart.resize(); });
 
-        // 弹窗逻辑
+        // ================= 交互逻辑 =================
         const mask = document.getElementById('mask');
         const sheet = document.getElementById('sheet');
-        const title = document.getElementById('sheetTitle');
-        const content = document.getElementById('sheetContent');
+        const sheetTitle = document.getElementById('sheetTitle');
+        const sheetTag = document.getElementById('sheetTag');
+        const sheetContent = document.getElementById('sheetContent');
 
-        function showSheet(node) {
-            const info = node.info;
-            title.innerText = node.name.replace('\n', ' ');
-            
-            let html = `
-                <div class="k-block">
-                    <span class="k-label bg-def">Concept</span>
-                    <div class="k-content">${info.def}</div>
-                </div>
-                <div class="k-block">
-                    <span class="k-label bg-rule">Rules (FA24)</span>
-                    <div class="k-content">${info.rule}</div>
-                </div>
-            `;
-
-            if (info.question) {
-                html += `
-                    <div class="k-block">
-                        <span class="k-label bg-exam">Comprehensive Question</span>
-                        <div class="q-box">
-                            ${info.question}
-                            <details>
-                                <summary></summary>
-                                <div class="answer-area">${info.answer}</div>
-                                <div class="marker-note">📌 ${info.trap}</div>
-                            </details>
-                        </div>
-                    </div>
-                `;
-            } else if (info.trap) {
-                 html += `<div class="marker-note">📌 ${info.trap}</div>`;
+        // 点击事件
+        myChart.on('click', function(params) {
+            if (params.data.content) {
+                openSheet(params.data);
             }
+        });
 
-            content.innerHTML = html;
+        function openSheet(node) {
+            const content = node.content;
+            
+            // 渲染头部
+            sheetTitle.innerText = node.name.replace('\n', ' ');
+            sheetTag.innerText = node.category;
+            sheetTag.style.backgroundColor = node.color;
+            
+            // 渲染内容
+            let html = `<div class="lecture-block">
+                            <div class="text-content" style="font-size:15px; color:#2c3e50;">${content.intro}</div>
+                        </div>`;
+
+            content.sections.forEach(section => {
+                html += `<div class="lecture-block">
+                            <div class="lecture-title" style="border-color:${node.color}">${section.title}</div>`;
+                
+                if (section.isQuestion) {
+                    // 综合题渲染
+                    html += `<div class="exam-box">
+                                <div class="exam-header">EXAM STANDARD QUESTION</div>
+                                <div class="exam-body">
+                                    ${section.q}
+                                    <details>
+                                        <summary>解析与板书</summary>
+                                        <div class="solution-area">${section.a}</div>
+                                        <div class="lecturer-note">💡 <b>Lecturer's Note:</b><br>${section.note}</div>
+                                    </details>
+                                </div>
+                             </div>`;
+                } else {
+                    // 普通知识点
+                    html += `<div class="text-content">${section.content}</div>`;
+                }
+                
+                html += `</div>`;
+            });
+
+            sheetContent.innerHTML = html;
+            
+            // 显示弹窗
             mask.classList.add('show');
             sheet.classList.add('show');
         }
