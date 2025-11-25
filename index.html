@@ -3,146 +3,188 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ACCA TX (UK) FA2024 | IHT Master Class</title>
+    <title>ACCA TX (UK) FA2024 | Premium Master Class</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
     <style>
-        /* === 全局重置与移动端优化 === */
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        /* === 1. 沉浸式底层设计 === */
+        :root {
+            --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.6);
+            --shadow-soft: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            --text-primary: #2d3436;
+            --text-secondary: #636e72;
+            /* 专属高级色盘 */
+            --col-it: #ff7675;
+            --col-ct: #0984e3;
+            --col-cgt: #6c5ce7;
+            --col-iht: #00b894;
+            --col-vat: #fdcb6e;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { 
             margin: 0; padding: 0; overflow: hidden; 
-            background-color: #f4f7f6; /* 极淡的云雾青背景，专注阅读 */
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            background: var(--bg-gradient);
+            font-family: -apple-system, "SF Pro Text", "Helvetica Neue", sans-serif;
         }
-        #main { width: 100vw; height: 100vh; z-index: 1; }
+        #main { width: 100vw; height: 100vh; }
 
-        /* === 顶部悬浮栏 === */
+        /* === 2. 悬浮标题 (极简主义) === */
         .header {
-            position: fixed; top: 0; left: 0; right: 0; height: 50px;
-            background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(0,0,0,0.06); z-index: 100;
-            display: flex; align-items: center; justify-content: space-between; padding: 0 20px;
+            position: fixed; top: 20px; left: 24px; z-index: 50;
+            pointer-events: none;
         }
-        .header h1 { font-size: 16px; font-weight: 700; color: #2c3e50; margin: 0; letter-spacing: -0.5px; }
-        .header-tag { 
-            background: #1abc9c; color: #fff; padding: 3px 8px; 
-            border-radius: 4px; font-size: 11px; font-weight: 600; 
+        .header h1 { 
+            font-size: 28px; font-weight: 800; color: var(--text-primary); margin: 0; 
+            letter-spacing: -1px; text-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .header .badge {
+            display: inline-block; margin-top: 6px;
+            background: rgba(45, 52, 54, 0.9); color: #fff; 
+            padding: 4px 10px; border-radius: 20px; 
+            font-size: 11px; font-weight: 600; letter-spacing: 1px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
-        /* === 底部沉浸式阅读卡片 === */
+        /* === 3. 毛玻璃详情面板 (Glassmorphism) === */
         .sheet-mask {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.3); z-index: 199; display: none;
-            transition: opacity 0.3s;
+            background: rgba(0,0,0,0.2); backdrop-filter: blur(4px);
+            z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.3s;
         }
-        .sheet-mask.active { display: block; animation: fadeIn 0.2s; }
+        .sheet-mask.active { opacity: 1; pointer-events: auto; }
 
-        .sheet-container {
+        .sheet {
             position: fixed; bottom: 0; left: 0; right: 0;
-            background: #fff; z-index: 200;
-            border-top-left-radius: 24px; border-top-right-radius: 24px;
-            box-shadow: 0 -10px 50px rgba(0,0,0,0.15);
-            transform: translateY(110%); transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
-            display: flex; flex-direction: column; max-height: 88vh; /* 增加高度以容纳更多内容 */
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-top: var(--glass-border);
+            border-radius: 30px 30px 0 0;
+            box-shadow: var(--shadow-soft);
+            z-index: 100; max-height: 88vh; 
+            transform: translateY(110%); transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+            display: flex; flex-direction: column;
         }
-        .sheet-container.active { transform: translateY(0); }
+        .sheet.active { transform: translateY(0); }
 
-        /* 卡片头部 */
+        /* 头部控制栏 */
+        .sheet-drag-handle {
+            width: 40px; height: 5px; background: #dfe6e9; 
+            border-radius: 10px; margin: 12px auto 0;
+        }
         .sheet-header {
-            padding: 18px 24px; border-bottom: 1px solid #f0f2f5;
-            display: flex; align-items: center; justify-content: space-between;
-            flex-shrink: 0; background: #fff; border-radius: 24px 24px 0 0;
+            padding: 15px 24px; display: flex; align-items: flex-start; justify-content: space-between;
+            border-bottom: 1px solid rgba(0,0,0,0.03);
         }
-        .sheet-title-group { display: flex; flex-direction: column; }
-        .sheet-category { font-size: 11px; font-weight: 800; color: #bdc3c7; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
-        .sheet-title { font-size: 20px; font-weight: 800; color: #2c3e50; margin: 0; }
+        .sheet-tag {
+            font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 1.5px;
+            color: #b2bec3; display: block; margin-bottom: 4px;
+        }
+        .sheet-title { font-size: 22px; font-weight: 800; color: var(--text-primary); margin: 0; line-height: 1.2; }
+        
         .close-btn {
-            width: 32px; height: 32px; background: #f1f2f6; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 22px; color: #7f8c8d; cursor: pointer;
+            width: 32px; height: 32px; background: rgba(0,0,0,0.05); 
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 18px; color: var(--text-secondary);
+            transition: all 0.2s;
         }
+        .close-btn:active { transform: scale(0.9); background: rgba(0,0,0,0.1); }
 
-        /* 卡片内容区 - 讲义风格 */
+        /* 内容滚动区 */
         .sheet-body { 
-            padding: 0 0 40px 0; overflow-y: auto; -webkit-overflow-scrolling: touch; 
-            background: #fff; 
+            padding: 0 24px 40px; overflow-y: auto; -webkit-overflow-scrolling: touch; 
         }
-        .content-wrapper { padding: 24px; }
 
-        /* 1. 核心定义区 */
-        .def-block { margin-bottom: 25px; }
-        .block-title { 
-            font-size: 14px; font-weight: 800; color: #34495e; margin-bottom: 12px; 
-            display: flex; align-items: center; letter-spacing: 0.5px;
+        /* === 4. 讲义排版组件 === */
+        
+        /* 定义卡片 */
+        .concept-card {
+            margin-top: 20px; padding: 16px; background: #fff;
+            border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            border: 1px solid rgba(0,0,0,0.02);
         }
-        .block-title::before { 
-            content:''; width:4px; height:16px; background:#1abc9c; 
-            margin-right:10px; border-radius:2px; 
-        }
-        .text-std { font-size: 15px; line-height: 1.7; color: #57606f; text-align: justify; }
-        .text-std strong { color: #2c3e50; font-weight: 700; }
-        .text-std ul { padding-left: 20px; margin: 8px 0; }
-        .text-std li { margin-bottom: 6px; }
+        .concept-title { font-size: 13px; font-weight: 800; color: var(--text-secondary); margin-bottom: 8px; display: flex; align-items: center;}
+        .concept-title::before { content:''; display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--text-primary); margin-right:8px; }
+        .concept-text { font-size: 15px; line-height: 1.6; color: var(--text-primary); text-align: justify; }
 
-        /* 2. 规则卡片 (Rules) */
-        .rule-card {
-            background: #f8fbff; border: 1px solid #e1eefc; border-radius: 8px;
-            padding: 15px; margin-bottom: 10px;
+        /* 规则列表 */
+        .rule-list { margin-top: 20px; }
+        .rule-item {
+            position: relative; padding-left: 20px; margin-bottom: 12px;
+            font-size: 14px; color: #555; line-height: 1.5;
         }
-        .rule-header { font-size: 12px; font-weight: 800; color: #3498db; margin-bottom: 6px; text-transform: uppercase; }
-        .rule-body { font-size: 14px; color: #2c3e50; line-height: 1.6; font-family: "Menlo", sans-serif; }
+        .rule-item::before {
+            content: '•'; position: absolute; left: 0; top: 0; 
+            color: var(--col-ct); font-weight: bold; font-size: 18px; line-height: 1.2;
+        }
+        .highlight { 
+            background: linear-gradient(120deg, rgba(255, 234, 167, 0.5) 0%, rgba(255, 234, 167, 0) 100%);
+            padding: 0 4px; font-weight: 700; color: #d35400; border-radius: 4px;
+        }
 
-        /* 3. 综合案例区 (Example) */
-        .exam-box {
-            border: 1px solid #eee; border-radius: 12px; overflow: hidden; margin-top: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        /* 综合大题容器 (Exam Question) */
+        .exam-container {
+            margin-top: 25px; border-radius: 16px; overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.06); background: #fff;
         }
-        .exam-title-bar {
-            background: #fff5f5; padding: 12px 16px; border-bottom: 1px solid #ffebe6;
-            font-size: 13px; font-weight: 700; color: #e17055;
+        .exam-header {
+            background: #fdfbf7; padding: 12px 16px;
+            font-size: 12px; font-weight: 800; color: #e17055; letter-spacing: 1px;
+            border-bottom: 1px dashed #eee;
         }
         .exam-content { padding: 16px; font-size: 14px; line-height: 1.7; color: #2d3436; }
-
-        /* 4. 折叠解析区 */
-        details { margin-top: 12px; border-top: 1px dashed #e0e0e0; }
+        
+        /* 折叠解析 (优雅动画) */
+        details { margin-top: 10px; }
         summary {
-            padding: 12px 0; cursor: pointer; font-size: 13px; font-weight: 600; color: #2980b9;
+            padding: 12px; background: #f8f9fa; border-radius: 10px;
+            font-size: 13px; font-weight: 600; color: #0984e3; cursor: pointer;
             list-style: none; display: flex; justify-content: space-between;
+            transition: background 0.2s;
         }
-        summary::after { content: '查看解析 ▼'; color: #95a5a6; font-weight: normal; }
-        details[open] summary::after { content: '收起 ▲'; }
+        summary:active { background: #e9ecef; }
+        summary::after { content: '+ 解析与板书'; font-size: 12px; opacity: 0.7; }
+        details[open] summary::after { content: '- 收起'; }
         
-        .proforma-box {
-            background: #2c3e50; color: #ecf0f1; padding: 15px; border-radius: 8px;
-            font-family: "Menlo", monospace; font-size: 12px; line-height: 1.5; margin-top: 10px;
-            border-left: 4px solid #f1c40f;
+        /* 板书区域 */
+        .blackboard {
+            background: #2d3436; color: #dfe6e9; padding: 16px; 
+            border-radius: 0 0 10px 10px; margin-top: 2px;
+            font-family: "Menlo", monospace; font-size: 12px; line-height: 1.6;
+            white-space: pre-wrap; border-left: 4px solid #f1c40f;
         }
-        .note-box {
-            background: #fff8e1; padding: 12px; border-radius: 6px; margin-top: 10px;
-            color: #d35400; font-size: 13px; font-style: italic; border: 1px solid #ffe0b2;
+        .teacher-tip {
+            margin-top: 10px; padding: 10px; background: #fff5f5;
+            border-radius: 8px; color: #c0392b; font-size: 12px;
+            border: 1px solid #ffeceb; display: flex; gap: 8px;
         }
 
-        @keyframes fadeIn { from {opacity:0} to {opacity:1} }
-        
-        /* 高亮标记 */
-        .hl { background: rgba(26, 188, 156, 0.15); padding: 0 4px; border-radius: 3px; color: #16a085; font-weight: bold; }
-        .hl-red { color: #e74c3c; font-weight: bold; }
+        /* Proforma 代码块 */
+        .code-block {
+            background: #f4f6f8; border: 1px solid #e1e4e8; border-radius: 8px;
+            padding: 12px; font-family: "Menlo", monospace; font-size: 12px;
+            color: #2c3e50; margin-bottom: 10px; white-space: pre-wrap;
+        }
+
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h1>TX (UK) Master Guide</h1>
-        <span class="header-tag">FA2024</span>
+        <h1>TX (UK) Master</h1>
+        <span class="badge">FA2024 旗舰版</span>
     </div>
 
     <div id="main"></div>
 
     <div class="sheet-mask" id="mask" onclick="closeSheet()"></div>
-    <div class="sheet-container" id="sheet">
+    <div class="sheet" id="sheet">
+        <div class="sheet-drag-handle"></div>
         <div class="sheet-header">
-            <div class="sheet-title-group">
-                <span class="sheet-category" id="nodeCategory">MODULE</span>
-                <h2 class="sheet-title" id="nodeTitle">Title</h2>
+            <div>
+                <span class="sheet-tag" id="sheetTag">MODULE</span>
+                <h2 class="sheet-title" id="sheetTitle">Topic Title</h2>
             </div>
             <div class="close-btn" onclick="closeSheet()">×</div>
         </div>
@@ -151,301 +193,338 @@
     </div>
 
     <script type="text/javascript">
+        // 移动端触摸优化
+        document.addEventListener('touchstart', function() {}, {passive: true});
+
         var chartDom = document.getElementById('main');
         var myChart = echarts.init(chartDom, null, {renderer: 'canvas'});
 
-        // ================= 配色系统 =================
+        // ================= 数据可视化配置 =================
+        
+        // 定义节点样式函数 (生成发光球体)
+        const createNodeStyle = (color) => ({
+            color: {
+                type: 'radial', x: 0.5, y: 0.5, r: 0.5,
+                colorStops: [
+                    { offset: 0, color: '#fff' }, // 高光
+                    { offset: 0.3, color: color }, 
+                    { offset: 1, color: color }
+                ]
+            },
+            shadowBlur: 15, shadowColor: color,
+            borderColor: '#fff', borderWidth: 2
+        });
+
         const colors = {
-            root: '#2c3e50', // 核心
-            iht: '#1abc9c',  // IHT (本次重点 - 青绿色)
-            it: '#e74c3c',   // IT (红色)
-            ct: '#3498db',   // CT (蓝色)
-            cgt: '#9b59b6',  // CGT (紫色)
-            vat: '#f39c12'   // VAT (橙色)
+            root: '#636e72',
+            it: '#ff7675',
+            ct: '#74b9ff',
+            cgt: '#a29bfe',
+            iht: '#00b894', // 重点优化
+            vat: '#fab1a0'
         };
 
-        // ================= 深度内容库 (完全基于您的讲义要求) =================
-        const data = [
-            // --- ROOT ---
+        // ================= 大师级内容库 (FA2024 深度版) =================
+        
+        const graphData = [
+            // --- Root ---
             {
-                id: 'root', name: 'UK TAX\nSystem', category: 'Overview', color: colors.root, size: 70,
+                id: '0', name: 'UK TAX\nSystem', category: 'SYSTEM', symbolSize: 80,
+                itemStyle: createNodeStyle(colors.root),
                 info: {
-                    def: 'FA2024 核心概览',
-                    content: [
-                        {type: 'text', text: '包含了 Income Tax, Corporation Tax, CGT, IHT, VAT 五大税种。<br>本图谱重点强化 <b>IHT (遗产税)</b> 模块，按照生前到死后的时间轴逻辑展开。'}
+                    def: 'FA2024 (Finance Act 2024) 核心变更概览。',
+                    rules: [
+                        '<b>NIC:</b> 费率下调 (8%/6%) 是今年最大考点。',
+                        '<b>CGT:</b> 住宅税率降至 24%，AEA 降至 £3,000。',
+                        '<b>VAT:</b> 注册门槛上调至 £90,000。'
                     ]
                 }
             },
 
-            // ================= IHT 遗产税 (重头戏) =================
+            // --- IHT (深度复刻讲义) ---
             {
-                id: 'iht_basic', name: 'IHT Basics\n核心概念', category: 'IHT', color: colors.iht, size: 55,
+                id: 'iht', name: 'IHT\n遗产税', category: 'IHT', symbolSize: 70,
+                itemStyle: createNodeStyle(colors.iht),
                 info: {
-                    def: '价值转移 (Transfer of Value)',
-                    content: [
-                        {type: 'text', text: '<b>定义:</b> 捐赠导致捐赠者财富减少的金额 (Diminution in value)。<br><b>纳税人:</b><br>• UK Domiciled: 全球资产征税。<br>• Non-UK Domiciled: 仅英国资产征税。'},
-                        {type: 'rule', title: 'CRITICAL RATES (FA24)', text: '<b>NRB (零税率带):</b> £325,000<br><b>RNRB (居住零税率带):</b> £175,000<br><b>Lifetime Rate:</b> 20% (Trustee付) / 25% (Donor付)<br><b>Death Rate:</b> 40%'}
+                    def: '基于“价值转移” (Transfer of Value) 的累积型税种。',
+                    rules: [
+                        '<b>NRB (零税率带):</b> £325,000',
+                        '<b>RNRB (居住零税率带):</b> £175,000 (需留给直系后代)',
+                        '<b>Rate:</b> Death 40% | Lifetime 20%'
+                    ],
+                    proformas: [
+                        {t: 'Step 1: Lifetime Tax (CLT)', c: 'Transfer Value\n(Less: Exemptions)\n= Chargeable Transfer\n(Less: Available NRB - 7 yr cumulation)\n= Taxable x 20% (Trustee)'},
+                        {t: 'Step 2: Death Tax (Gifts)', c: 'Gross Value (at gift date)\n(Less: NRB at death - 7 yr cumulation)\n= Taxable x 40%\n(Less: Taper Relief)\n(Less: Lifetime Tax Paid)'},
+                        {t: 'Step 3: Death Estate', c: 'Total Assets (Probate)\n(Less: Debts/Funeral)\n(Less: Spouse Exempt)\n= Chargeable Estate\n(Less: RNRB + Remaining NRB)\n= Taxable x 40%'}
                     ]
                 }
             },
             {
-                id: 'iht_life', name: 'Lifetime\n生前转移', category: 'IHT', color: colors.iht, size: 50,
+                id: 'iht_life', name: 'Lifetime\n生前转移', category: 'IHT', symbolSize: 50,
+                itemStyle: createNodeStyle(colors.iht),
                 info: {
-                    def: '生前礼物的三类处理方式',
-                    content: [
-                        {type: 'rule', title: 'A. 豁免转移 (Exempt)', text: '1. <b>Spouse:</b> 配偶间永远豁免。<br>2. <b>AE (年免):</b> £3,000/年 (FIFO, 可结转1年)。<br>3. <b>Small Gifts:</b> £250/人。<br>4. <b>Marriage:</b> 父母£5k, 祖父母£2.5k, 其他£1k。<br>5. <b>Normal Expenditure:</b> 经常性支出。'},
-                        {type: 'rule', title: 'B. PET (给个人)', text: '<b>Potentially Exempt Transfer:</b><br>• 生前暂不交税。<br>• 活过7年 -> 彻底豁免。<br>• 7年内死 -> 补交 Death Tax。'},
-                        {type: 'rule', title: 'C. CLT (给信托)', text: '<b>Chargeable Lifetime Transfer:</b><br>• 立即交税: (Value - Exempt - NRB) × 20%。<br>• 7年内死 -> 重算 Death Tax。'}
+                    def: 'PET (个人) vs CLT (信托)',
+                    rules: [
+                        '<b>PET:</b> 赠与时无税。活过 7 年免税。死在 7 年内补税。',
+                        '<b>CLT:</b> 立即征税 (超出 NRB 部分交 20%)。死在 7 年内重算。',
+                        '<b>Exemptions:</b> AE £3,000 (FIFO, 1yr c/f); Marriage £5k/£2.5k/£1k; Small Gifts £250.'
                     ],
-                    q: {
-                        title: 'Lifetime Tax Calculation (CLT Only)',
-                        scen: '2023年5月，A 向信托转入 £400,000 (CLT)。A 承担税款。此前无赠与。',
-                        ans: `1. Chargeable Value: £400,000
-2. Less AE (23/24 & 22/23): (£6,000)
+                    question: {
+                        s: '2023年5月 (23/24)，A 向信托转入 £400,000 (CLT)。A 支付税款。此前无任何赠与。',
+                        t: '计算 Lifetime IHT Payable。',
+                        a: `1. Chargeable Transfer:
+   £400,000 - £3,000 (AE 23/24) - £3,000 (AE 22/23) 
    = £394,000
-3. Less NRB: (£325,000)
-   = Taxable £69,000
-4. Tax @ 25% (Donor pays): 
-   £69,000 × 25% = <b>£17,250</b>`
+
+2. Taxable Amount:
+   £394,000 - £325,000 (NRB) = £69,000
+
+3. Tax Liability (Donor Pays):
+   £69,000 × 25% = £17,250`,
+                        n: '因为是 Donor (捐赠人) 付税，税率是 20/80 = 25%。如果是 Trustee 付，则是 20%。'
                     }
                 }
             },
             {
-                id: 'iht_death_gift', name: 'Death Tax\non Gifts', category: 'IHT', color: colors.iht, size: 50,
+                id: 'iht_death', name: 'Death Tax\n死后追溯', category: 'IHT', symbolSize: 50,
+                itemStyle: createNodeStyle(colors.iht),
                 info: {
-                    def: '7年内死亡的追溯税 (Additional Tax)',
-                    content: [
-                        {type: 'text', text: '当捐赠人在送礼后 7 年内死亡，之前的 PET 和 CLT 需要重算。'},
-                        {type: 'rule', title: 'CALCULATION LOGIC', text: '1. 找出死前7年内所有 PET/CLT。<br>2. <b>NRB 扣除:</b> 使用死亡时的 £325k，减去该礼物之前 7 年累积的 GCT。<br>3. <b>Tax:</b> 剩余部分 × 40%。<br>4. <b>Taper Relief:</b> 3-4年(8折), 4-5年(6折), 5-6年(4折), 6-7年(2折)。<br>5. <b>Credit:</b> 减去 CLT 已交的生前税。'}
+                    def: '7年原则 (The 7 Year Rule)',
+                    rules: [
+                        '<b>Look Back:</b> 仅追溯死前 7 年内的礼物。',
+                        '<b>NRB 扣除:</b> 使用死时的 NRB (£325k)，减去该礼物**再往前推7年**的累积赠与。',
+                        '<b>Taper Relief:</b> 3-4yr(20%), 4-5(40%), 5-6(60%), 6-7(80%) off TAX.'
                     ],
-                    q: {
-                        title: 'Comprehensive Death Tax',
-                        scen: 'A 在2020年做了 CLT (GCT £200k)。2024年去世 (4年内)。<br>计算该 CLT 的 Death Tax。',
-                        ans: `<b>Step 1: Gross Chargeable Value</b>
-Value = £200,000 (as calculated at lifetime)
+                    question: {
+                        s: 'A 在 2020年做了一个 CLT (GCT £200k)。2024年去世 (4年内)。计算该 CLT 的 Death Tax。',
+                        t: 'Calculate Additional Tax.',
+                        a: `1. Gross Value: £200,000 (Gift date value)
 
-<b>Step 2: Available NRB</b>
-NRB at death = £325,000
-Less: Gifts 7 years before this gift = 0
-Available = £325,000
-(£200k fully covered by NRB)
+2. Available NRB:
+   £325,000 (Death rate)
+   Less: Gifts 7 years prior to 2020 = 0
+   = £325,000
 
-<b>Step 3: Tax</b>
-Taxable = 0. Death Tax = <b>£0</b>.
-(注：如果 Value 超过 325k，则超额部分 x 40%，再 x 60% Taper)`
+3. Taxable:
+   £200,000 is fully covered by NRB.
+   Tax = £0.`,
+                        n: '即使 Death Tax 为 0，这个 CLT 依然会消耗掉 £200k 的 NRB，导致后续的 Death Estate 可用的 NRB 减少！'
+                    }
+                }
+            },
+
+            // --- Income Tax ---
+            {
+                id: 'it', name: 'Income Tax\n个税', category: 'IT', symbolSize: 60,
+                itemStyle: createNodeStyle(colors.it),
+                info: {
+                    def: 'NS -> Sav -> Div 顺序计算。',
+                    rules: [
+                        '<b>PA:</b> £12,570 (ANI > 100k 递减)',
+                        '<b>Div Rate:</b> 8.75% / 33.75% / 39.35%',
+                        '<b>Sav PSA:</b> £1,000 (Basic) / £500 (Higher)'
+                    ],
+                    question: {
+                        s: 'Salary £110k, Div £5k, Gift Aid £4k (Net)。',
+                        t: '计算应付税款。',
+                        a: `1. ANI = 110+5 - 5(Gross GA) = 110k.
+   PA = 12,570 - 5,000 = 7,570.
+2. Band Ext: 37,700 + 5,000 = 42,700.
+3. Tax:
+   NS (102,430): 42,700@20% + 59,730@40%
+   Div (5,000): 500@0% + 4,500@33.75%`,
+                        n: 'ANI 计算减去 Gross Gift Aid，Band 扩展加上 Gross Gift Aid。'
                     }
                 }
             },
             {
-                id: 'iht_estate', name: 'Death\nEstate', category: 'IHT', color: colors.iht, size: 50,
+                id: 'nic', name: 'NIC\n社保', category: 'IT', symbolSize: 45,
+                itemStyle: createNodeStyle(colors.it),
                 info: {
-                    def: '死亡遗产税 (Tax on Death Estate)',
-                    content: [
-                        {type: 'text', text: '对死者去世时拥有的所有资产征税。资产按市价 (Probate Value) 计算。'},
-                        {type: 'rule', title: 'A. RNRB (居住零税率带)', text: '<b>金额:</b> £175,000。<br><b>条件:</b> 包含主居所 (Main Residence) 且留给直系后代 (Direct Descendants)。<br><b>限制:</b> 房产净值 < £175k 时以净值为准。'},
-                        {type: 'rule', title: 'B. Transferable NRB', text: '配偶先去世未用完的 NRB/RNRB 百分比，可以转移给后去世的配偶。'}
-                    ]
-                }
-            },
-            {
-                id: 'iht_proforma', name: 'Proformas\n计算模板', category: 'IHT', color: '#16a085', size: 60,
-                info: {
-                    def: '三大核心计算模板 (必背)',
-                    content: [
-                        {type: 'proforma', title: 'STEP 1: Lifetime Tax (CLT)', text: `Transfer of Value
-(Less: Exemptions - AE, Marriage)
-= Chargeable Transfer
-(Less: Available NRB - look back 7 years)
-= Taxable Amount x 20% (Trustee) or 25% (Donor)`},
-                        {type: 'proforma', title: 'STEP 2: Death Tax on Gifts', text: `Gross Chargeable Value (Value at date of gift)
-(Less: NRB at death - look back 7 yrs from gift)
-= Taxable Amount x 40%
-(Less: Taper Relief - 20/40/60/80%)
-(Less: Lifetime tax paid - CLT only)
-= Additional Tax Payable`},
-                        {type: 'proforma', title: 'STEP 3: Death Estate', text: `Total Assets (Probate Value)
-(Less: Debts & Funeral)
-(Less: Exempt Legacies to Spouse)
-= Chargeable Estate
-(Less: RNRB - max £175k)
-(Less: Remaining NRB - £325k less gifts in last 7 yrs)
-= Taxable Estate x 40%`}
+                    def: 'FA24 新税率 (必背)',
+                    rules: [
+                        'Class 1 Emp: <span class="highlight">8%</span> (£12,570-£50,270)',
+                        'Class 4 Self: <span class="highlight">6%</span> (同区间)'
                     ]
                 }
             },
 
-            // ================= 其他税种 (保持精简但高质) =================
+            // --- CT ---
             {
-                id: 'it_main', name: 'Income Tax\n个税', category: 'IT', color: colors.it, size: 45,
+                id: 'ct', name: 'Corp Tax\n公司税', category: 'CT', symbolSize: 60,
+                itemStyle: createNodeStyle(colors.ct),
                 info: {
-                    def: 'NS/Sav/Div 征税顺序',
-                    content: [
-                        {type: 'rule', title: 'FA24 Updates', text: 'PA £12,570 (ANI>100k 递减)。<br>Div 0% band 降为 £500。'}
-                    ]
+                    def: 'TTP 计算 & 边际减免',
+                    rules: [
+                        'Lower £50k (19%) | Upper £250k (25%)',
+                        'Marginal Relief: (U-A) x 3/200',
+                        '<b>Full Expensing:</b> New Main Pool Asset 100% FYA'
+                    ],
+                    question: {
+                        s: 'TP £190k, Div Received £10k。无关联公司。',
+                        t: '计算 CT。',
+                        a: `1. TTP = £190,000
+2. Augmented Profit = 190k + 10k = £200,000
+3. Tax:
+   190k x 25% = 47,500
+   Less Relief: (250k-200k) x 3/200 x (190/200)
+   = (712.5)
+   Payable = £46,787.5`,
+                        n: 'Augmented Profits 决定税率区间，TTP 决定计税基数。'
+                    }
                 }
             },
+
+            // --- CGT ---
             {
-                id: 'nic', name: 'NIC\n社保', category: 'IT', color: colors.it, size: 40,
+                id: 'cgt', name: 'CGT\n资本利得', category: 'CGT', symbolSize: 60,
+                itemStyle: createNodeStyle(colors.cgt),
                 info: {
-                    def: 'FA24 新费率',
-                    content: [
-                        {type: 'rule', title: 'Rates', text: 'Class 1 Emp: <span class="hl-red">8%</span><br>Class 4 Self: <span class="hl-red">6%</span>'}
-                    ]
+                    def: '个人资产处置。',
+                    rules: [
+                        '<b>AEA:</b> <span class="highlight">£3,000</span>',
+                        '<b>Residential:</b> 18% / <span class="highlight">24%</span> (FA24)',
+                        '<b>BADR:</b> 10% (Lifetime £1m)'
+                    ],
+                    question: {
+                        s: '高收入者卖投资房赚 £13k。',
+                        t: '计算 CGT。',
+                        a: `1. Taxable: 13,000 - 3,000(AEA) = 10,000
+2. Tax: 10,000 x 24% = £2,400`,
+                        n: '住宅高税率是 24%，不再是 28%。'
+                    }
                 }
             },
+
+            // --- VAT ---
             {
-                id: 'ct_main', name: 'Corp Tax\n公司税', category: 'CT', color: colors.ct, size: 45,
+                id: 'vat', name: 'VAT\n增值税', category: 'VAT', symbolSize: 60,
+                itemStyle: createNodeStyle(colors.vat),
                 info: {
-                    def: 'TTP & Marginal Relief',
-                    content: [
-                        {type: 'rule', title: 'Rates', text: '19% (£0-50k) -> Marginal -> 25% (£250k+)'},
-                        {type: 'rule', title: 'Full Expensing', text: '全新主池资产 100% FYA。'}
-                    ]
-                }
-            },
-            {
-                id: 'cgt_main', name: 'CGT\n利得税', category: 'CGT', color: colors.cgt, size: 45,
-                info: {
-                    def: '个人资产处置',
-                    content: [
-                        {type: 'rule', title: 'Rates', text: 'AEA: £3,000。<br>Resi: 18%/24% (FA24新规)。<br>Other: 10%/20%。'}
-                    ]
-                }
-            },
-            {
-                id: 'vat_main', name: 'VAT\n增值税', category: 'VAT', color: colors.vat, size: 45,
-                info: {
-                    def: '注册与计算',
-                    content: [
-                        {type: 'rule', title: 'Thresholds', text: 'Reg: £90,000。<br>Dereg: £88,000。'}
+                    def: '注册与计算。',
+                    rules: [
+                        'Reg: <span class="highlight">£90,000</span> (FA24)',
+                        'Dereg: £88,000',
+                        'PPD: VAT based on actual payment.'
                     ]
                 }
             }
         ];
 
-        // 连线关系 (IHT 为核心)
         const links = [
-            { source: 'root', target: 'iht_basic' },
-            { source: 'iht_basic', target: 'iht_life' },
-            { source: 'iht_life', target: 'iht_death_gift' },
-            { source: 'iht_death_gift', target: 'iht_estate' },
-            { source: 'iht_estate', target: 'iht_proforma' },
-            
-            { source: 'root', target: 'it_main' }, { source: 'it_main', target: 'nic' },
-            { source: 'root', target: 'ct_main' },
-            { source: 'root', target: 'cgt_main' },
-            { source: 'root', target: 'vat_main' }
+            { source: '0', target: 'it' }, { source: 'it', target: 'nic' },
+            { source: '0', target: 'ct' },
+            { source: '0', target: 'cgt' },
+            { source: '0', target: 'iht' }, { source: 'iht', target: 'iht_life' }, { source: 'iht_life', target: 'iht_death' },
+            { source: '0', target: 'vat' }
         ];
 
-        // ECharts 配置
         const option = {
             backgroundColor: 'transparent',
             series: [{
                 type: 'graph',
                 layout: 'force',
-                data: data,
+                data: graphData,
                 links: links,
                 roam: true,
+                draggable: true,
                 zoom: 0.8,
                 label: {
                     show: true,
                     position: 'bottom',
-                    color: '#555',
+                    color: '#636e72',
                     fontSize: 11,
                     fontWeight: 'bold',
-                    formatter: '{b}'
-                },
-                itemStyle: {
-                    borderColor: '#fff',
-                    borderWidth: 2,
-                    shadowBlur: 10,
-                    shadowColor: 'rgba(0,0,0,0.1)'
+                    formatter: '{b}',
+                    distance: 10
                 },
                 lineStyle: {
-                    color: '#bdc3c7',
-                    curveness: 0.2,
-                    width: 1.5
+                    color: '#b2bec3',
+                    width: 1.5,
+                    curveness: 0.2, // 丝滑曲线
+                    opacity: 0.5
                 },
                 force: {
                     repulsion: 400,
                     edgeLength: 100,
-                    gravity: 0.06
+                    gravity: 0.08
                 }
             }]
         };
 
         myChart.setOption(option);
-        window.addEventListener('resize', function() { myChart.resize(); });
+        window.addEventListener('resize', () => myChart.resize());
 
         // ================= 交互逻辑 =================
         const mask = document.getElementById('mask');
         const sheet = document.getElementById('sheet');
         const sheetContent = document.getElementById('sheetContent');
-        const sheetTitle = document.getElementById('nodeTitle');
-        const sheetTag = document.getElementById('nodeCategory');
+        const titleDom = document.getElementById('sheetTitle');
+        const catDom = document.getElementById('sheetTag');
 
+        // 优化后的点击事件
         myChart.on('click', function(params) {
-            if (params.data.info) {
+            if (params.data && params.data.info) {
                 openSheet(params.data);
             }
         });
 
         function openSheet(node) {
             const info = node.info;
-            
-            // 1. 设置头部
-            sheetTitle.innerText = node.name.replace('\n', ' ');
-            sheetTitle.style.color = node.color;
-            sheetTag.innerText = node.category;
-            sheetTag.style.backgroundColor = node.color;
+            const mainColor = node.itemStyle.color.colorStops[1].color; // 提取主色
 
-            // 2. 生成内容
-            let html = `<div class="content-wrapper">`;
-            
-            // A. 核心定义
-            html += `<div class="def-block">
-                        <div class="block-title" style="color:${node.color}">CORE KNOWLEDGE</div>
-                        <div class="text-std">${info.def}</div>
-                     </div>`;
+            // 头部渲染
+            titleDom.innerText = node.name.replace('\n', ' ');
+            catDom.innerText = node.category;
+            catDom.style.color = mainColor;
 
-            // B. 内容列表 (Text / Rules / Proforma)
-            if (info.content) {
-                info.content.forEach(item => {
-                    if (item.type === 'text') {
-                        html += `<div class="text-std" style="margin-bottom:15px;">${item.text}</div>`;
-                    } else if (item.type === 'rule') {
-                        html += `<div class="rule-card">
-                                    <div class="rule-header" style="color:${node.color}">${item.title}</div>
-                                    <div class="rule-body">${item.text}</div>
-                                 </div>`;
-                    } else if (item.type === 'proforma') {
-                        html += `<div style="margin-bottom:20px;">
-                                    <div style="font-weight:bold; color:#2c3e50; margin-bottom:5px;">${item.title}</div>
-                                    <div class="proforma-box">${item.text.replace(/\n/g, '<br>')}</div>
-                                 </div>`;
-                    }
+            let html = '';
+
+            // 1. 定义卡片
+            if (info.def) {
+                html += `<div class="concept-card" style="border-left: 4px solid ${mainColor}">
+                            <div class="concept-title" style="color:${mainColor}">CORE CONCEPT</div>
+                            <div class="concept-text">${info.def}</div>
+                         </div>`;
+            }
+
+            // 2. 规则列表
+            if (info.rules) {
+                html += `<div class="rule-list">`;
+                info.rules.forEach(r => {
+                    html += `<div class="rule-item">${r}</div>`;
+                });
+                html += `</div>`;
+            }
+
+            // 3. Proforma 模板 (IHT 特有)
+            if (info.proformas) {
+                info.proformas.forEach(p => {
+                    html += `<div style="margin-top:15px">
+                                <div style="font-weight:800;font-size:12px;color:${mainColor};margin-bottom:5px">${p.t}</div>
+                                <div class="code-block">${p.c}</div>
+                             </div>`;
                 });
             }
 
-            // C. 综合题 (带折叠)
-            if (info.q) {
-                html += `<div class="exam-box">
-                            <div class="exam-title-bar">📝 EXAMPLE: ${info.q.title}</div>
+            // 4. 综合大题
+            if (info.question) {
+                const q = info.question;
+                html += `<div class="exam-container">
+                            <div class="exam-header">🔥 MASTER QUESTION</div>
                             <div class="exam-content">
-                                ${info.q.scen}
+                                <div style="margin-bottom:10px;font-style:italic;color:#636e72">${q.s}</div>
+                                <div style="font-weight:700;margin-bottom:10px">Task: ${q.t}</div>
                                 <details>
                                     <summary></summary>
-                                    <div class="solution-area">${info.q.ans}</div>
-                                    <div class="note-box">⚠️ ${info.q.note || 'Watch out for the 7-year rule!'}</div>
+                                    <div class="blackboard">${q.a}</div>
+                                    <div class="teacher-tip">💡 <b>Note:</b> ${q.n}</div>
                                 </details>
                             </div>
                          </div>`;
             }
 
-            html += `</div>`;
             sheetContent.innerHTML = html;
-            
-            // 3. 显示
             mask.classList.add('active');
             sheet.classList.add('active');
         }
