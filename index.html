@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ACCA TX (UK) FA2024 Ultimate Notes (Full Content)</title>
+    <title>ACCA TX (UK) FA2024 Ultimate Full Notes</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
     <style>
         /* === 1. 基础设置 (莫兰迪·晚霞主题) === */
@@ -56,7 +56,7 @@
             max-height: 85vh; 
         }
 
-        /* 💻 电脑端适配：限制宽度，居中显示，防止太宽难看 */
+        /* 💻 电脑端适配：限制宽度，居中显示 */
         @media (min-width: 768px) {
             .sheet {
                 left: 50%; transform: translateX(-50%) translateY(110%);
@@ -169,25 +169,36 @@
             boss: '#ffb7b2'
         };
 
-        // ================= 完整笔记数据库 (1:1 还原) =================
+        // ================= 完整笔记数据库 (1:1 还原 IHT + CGT) =================
         const data = [
             // --- Root ---
             { id: '0', name: 'ACCA TX\n(UK)', category: 'ROOT', symbolSize: 55, itemStyle: { color: c.root }, info: { def: 'FA2024 完整笔记 (IHT + CGT)。<br>点击分支查看详细讲义。' } },
 
-            // ==================== IHT 模块 (Legacy Data) ====================
+            // ==================== IHT 模块 (Full Content 1:1) ====================
             {
                 id: 'iht_1', name: 'IHT\n原理', category: 'IHT', symbolSize: 40, itemStyle: { color: c.iht },
                 info: {
-                    title: '1. 核心概念与税率',
+                    title: '1. 核心概念与税率 (Basic Principles)',
                     html: `
-                        <div class="section-title" style="border-color:${c.iht}">征税基础</div>
-                        <div class="text-content">IHT 基于 <b>价值转移 (Transfer of Value)</b>，即捐赠导致捐赠者财富减少的金额 (Diminution in value)。</div>
-                        <div class="section-title" style="border-color:${c.iht}">关键税率 (25/26)</div>
+                        <div class="section-title" style="border-color:${c.iht}">征税对象</div>
+                        [cite_start]<div class="text-content">IHT 是基于 <b>价值转移 (Transfer of Value)</b>，即捐赠导致捐赠者财富减少的金额 (Diminution in value) [cite: 1522]。</div>
+                        
+                        <div class="section-title" style="border-color:${c.iht}">纳税人身份</div>
+                        <div class="text-content">
+                            <ul>
+                                [cite_start]<li><b>UK Domiciled (英国居籍):</b> 对全球资产征税 [cite: 1524]。</li>
+                                [cite_start]<li><b>Non-UK Domiciled (非英国居籍):</b> 仅对英国资产征税 [cite: 1525]。</li>
+                            </ul>
+                        </div>
+
+                        <div class="section-title" style="border-color:${c.iht}">关键税率与额度 (2025/26)</div>
                         <div class="rule-card">
-                            <b>Nil Rate Band (NRB):</b> £325,000<br>
-                            <b>Residence NRB (RNRB):</b> £175,000<br>
-                            <b>Death Rate:</b> 40%<br>
-                            <b>Lifetime Rate:</b> 20% (Trustee) / 25% (Donor)
+                            <div class="text-content">
+                                [cite_start]<b>Nil Rate Band (NRB, 普通零税率带):</b> £325,000 [cite: 1527]。<br>
+                                [cite_start]<b>Residence Nil Rate Band (RNRB, 居住零税率带):</b> £175,000 [cite: 1528]。<br>
+                                [cite_start]<b>Death Rate (死亡税率):</b> 40% [cite: 1529]。<br>
+                                [cite_start]<b>Lifetime Rate (生前税率):</b> 20% (受赠人付) 或 25% (捐赠人付) [cite: 1530]。
+                            </div>
                         </div>
                     `
                 }
@@ -197,41 +208,206 @@
                 info: {
                     title: '2. 生前转移 (Lifetime Transfers)',
                     html: `
-                        <div class="section-title" style="border-color:${c.iht}">A. 豁免转移 (Exempt)</div>
+                        [cite_start]<div class="text-content">生前的礼物分为三类，处理方式截然不同 [cite: 1532]。</div>
+
+                        <div class="section-title" style="border-color:${c.iht}">A. 豁免转移 (Exempt Transfers)</div>
                         <div class="text-content">
+                            [cite_start]这些礼物无论生前还是死后，永远不征税 [cite: 1534]。
                             <ul>
-                                <li><b>Spouse:</b> 无限额豁免。</li>
-                                <li><b>AE (年免):</b> £3,000 (FIFO, 可结转1年)。</li>
-                                <li><b>Small Gifts:</b> £250 (每人每年)。</li>
-                                <li><b>Marriage:</b> 父母£5k, 祖父母£2.5k, 其他£1k。</li>
+                                [cite_start]<li><b>Spouse/Civil Partner (配偶):</b> 无限额豁免 [cite: 1535]。</li>
+                                [cite_start]<li><b>Annual Exemption (AE, 年度豁免):</b> 每年 £3,000。当年没用完可向后结转 1年 (FIFO原则：先用今年的，再用去年的) [cite: 1536]。</li>
+                                [cite_start]<li><b>Small Gifts (小额礼物):</b> 每位受赠人每年 £250 (若超过则全额不豁免) [cite: 1537]。</li>
+                                [cite_start]<li><b>Marriage Exemption (结婚礼物):</b> 父母送 £5,000，祖父母送 £2,500，其他人送 £1,000 [cite: 1538]。</li>
+                                [cite_start]<li><b>Normal expenditure out of income:</b> 必须证明是习惯性的且不影响生活水平 [cite: 1539]。</li>
                             </ul>
                         </div>
-                        <div class="section-title" style="border-color:${c.iht}">B. PET & CLT</div>
+                        <div class="case-box">
+                            <div class="case-header">🌰 案例 1：精打细算的爷爷</div>
+                            [cite_start]<div class="case-body">情景： Grandpa 在 2024年5月送给孙子 £8,000 结婚礼物。上一税年未做赠予 [cite: 1541]。</div>
+                            <details>
+                                <summary>查看解析</summary>
+                                <div class="ans">Transfer Value: £8,000
+(-) Marriage Exemption: (£2,500) (祖父母额度)
+(-) AE (Current Year): (£3,000)
+(-) AE (Brought Forward): (£2,500) (上一年结转)
+[cite_start]= Chargeable Value: £0 (完全豁免) [cite: 1542-1546]</div>
+                            </details>
+                        </div>
+
+                        <div class="section-title" style="border-color:${c.iht}">B. 潜在豁免转移 (PET)</div>
                         <div class="text-content">
-                            <b>PET (个人):</b> 生前不交税。活过7年免税。<br>
-                            <b>CLT (信托):</b> 立即交税 20%。7年累积原则。
+                            [cite_start]<b>定义：</b>个人送给 <b>个人</b> 的礼物 [cite: 1548]。<br>
+                            [cite_start]<b>生前处理：</b>不交税 (No immediate tax) [cite: 1549]。<br>
+                            <b>后果：</b><br>
+                            [cite_start]• 活过 7年 -> 完全豁免 [cite: 1551]。<br>
+                            [cite_start]• 7年内 死亡 -> 变成 Chargeable，需补交死亡税 [cite: 1552]。
+                        </div>
+
+                        <div class="section-title" style="border-color:${c.iht}">C. 应税生前转移 (CLT)</div>
+                        <div class="text-content">
+                            [cite_start]<b>定义：</b>个人送给 <b>信托 (Trust)</b> 的礼物 [cite: 1554]。<br>
+                            [cite_start]<b>生前处理：</b>立即交税 [cite: 1555]。<br>
+                            [cite_start]<b>计算：</b>(转移价值 - 豁免) - (剩余 NRB) [cite: 1556]。<br>
+                            [cite_start]<b>7年累积原则：</b>计算剩余 NRB 时，要扣除这笔礼物 <b>之前 7 年内</b> 的所有 GCT (Gross Chargeable Transfers) [cite: 1557]。<br>
+                            [cite_start]<b>税率：</b>超出部分交 20% (Trustee付) 或 25% (Donor付) [cite: 1558]。
                         </div>
                         <div class="case-box">
-                            <div class="case-header">🌰 案例：富豪的信托 (CLT)</div>
-                            <div class="case-body">转入信托 £400,000。此前7年无 CLT。</div>
-                            <details><summary>解析</summary><div class="ans">Chargeable: £400,000
-Less NRB: (£325,000)
-Taxable: £75,000
-Tax @ 20% = £15,000</div></details>
+                            <div class="case-header">🌰 案例 2：富豪的信托 (生前税)</div>
+                            [cite_start]<div class="case-body">情景： Mr. Rich 向信托转入 £400,000 (CLT)。此前7年内无 CLT，只有一个 PET (PET 生前不占用 NRB) [cite: 1560]。</div>
+                            <details>
+                                <summary>查看解析</summary>
+                                <div class="ans">Gross Chargeable Transfer: £400,000
+Less NRB: (£325,000) (此前无 CLT)
+Taxable Amount: £75,000
+[cite_start]Lifetime Tax: £75,000 × 20% = £15,000 [cite: 1561-1564]</div>
+                            </details>
                         </div>
                     `
                 }
             },
             {
                 id: 'iht_3', name: 'Death Tax\n死后追溯', category: 'IHT', symbolSize: 35, itemStyle: { color: c.iht_sub },
-                info: { title: '3. 死亡额外税', html: `<div class="text-content">死前 7 年内的 PET/CLT 需重算。<br><b>Taper Relief:</b> 3-7年税额打折 (20%-80% off)。<br><b>Credit:</b> 减去已交生前税。</div>` }
+                info: {
+                    title: '3. 死亡时的额外税 (Death Tax on Lifetime Gifts)',
+                    html: `
+                        [cite_start]<div class="text-content">当捐赠人在送礼后 7年内死亡，之前的 PET 和 CLT 需要拉回来重算一次税 [cite: 1566]。</div>
+
+                        <div class="section-title" style="border-color:${c.iht}">计算步骤</div>
+                        <div class="text-content">
+                            1. [cite_start]<b>查找：</b>找出死前 7 年内的所有 PET 和 CLT [cite: 1568]。<br>
+                            2. [cite_start]<b>NRB 扣除：</b>使用死亡时的 NRB (£325,000)，减去该礼物 <b>再往前推 7 年</b> 累积的 GCT [cite: 1569]。<br>
+                            3. [cite_start]<b>计算税额：</b>剩余部分 × 40% [cite: 1570]。
+                        </div>
+
+                        <div class="section-title" style="border-color:${c.iht}">Taper Relief (递减减免)</div>
+                        <div class="text-content">
+                            [cite_start]如果在送礼后活得够久，税额打折 [cite: 1571]：<br>
+                            • 3-4年: 8折 (20% reduction)<br>
+                            • 4-5年: 6折 (40% reduction)<br>
+                            • 5-6年: 4折 (60% reduction)<br>
+                            • 6-7年: 2折 (80% reduction)
+                        </div>
+
+                        <div class="section-title" style="border-color:${c.iht}">Credit</div>
+                        [cite_start]<div class="text-content">对于 CLT，减去生前已经交过的 20% 税 (Lifetime Tax) [cite: 1576]。</div>
+
+                        <div class="case-box">
+                            <div class="case-header">🌰 案例 3：不幸的富豪 (死后追溯)</div>
+                            <div class="case-body">情景： 接案例2，Mr. [cite_start]Rich 在送出 £100,000 PET 的 4.5 年后去世 [cite: 1578]。</div>
+                            <details>
+                                <summary>查看解析</summary>
+                                <div class="ans">Gross Value: £100,000
+Available NRB: £325,000 (该 PET 前 7 年无礼物)。
+[cite_start]Tax Payable: £0 (在 NRB 内，但吃掉了 £100k 额度，影响后续计算) [cite: 1579-1581]。</div>
+                            </details>
+                        </div>
+                    `
+                }
             },
             {
-                id: 'iht_boss', name: 'IHT BOSS\n综合题', category: 'IHT', symbolSize: 45, itemStyle: { color: c.boss },
+                id: 'iht_4', name: 'Estate\n死亡遗产', category: 'IHT', symbolSize: 35, itemStyle: { color: c.iht_sub },
                 info: {
-                    isBoss: true, title: '👹 IHT 终极战：NRB 耗尽',
-                    scen: 'Mr. Bond (2026死)。\n1. 2019 CLT £280k\n2. 2021 PET £150k\n3. Estate £800k (房给儿)。',
-                    ans: '1. CLT占£280k。剩45k。\n2. PET吃掉45k并溢出。\n3. 死时NRB=0。\n4. Tax=(£775k-£175k)*40% = £240k。'
+                    title: '4. 死亡遗产税 (Death Estate)',
+                    html: `
+                        [cite_start]<div class="text-content">这是对死者去世时拥有的所有资产征税 [cite: 1583]。</div>
+
+                        <div class="section-title" style="border-color:${c.iht}">A. 遗产估值 (Valuation)</div>
+                        <div class="text-content">
+                            [cite_start]资产按 <b>市价 (Market/Probate Value)</b> 计算 [cite: 1585]。<br>
+                            [cite_start]<b>可扣除 (Deductions)：</b>债务 (Debts)、未付税款、丧葬费 (Funeral expenses) [cite: 1586]。<br>
+                            [cite_start]<b>豁免：</b>留给配偶 (Spouse) 的遗产完全免税 [cite: 1587]。
+                        </div>
+
+                        <div class="section-title" style="border-color:${c.iht}">B. 居住零税率带 (RNRB)</div>
+                        <div class="text-content">
+                            [cite_start]<b>金额：</b>£175,000 [cite: 1589]。<br>
+                            [cite_start]<b>条件：</b>遗产中包含 <b>主要居所 (Main Residence)</b>，且留给了 <b>直系后代 (Direct Descendants)</b> (子女、孙子女) [cite: 1591, 1592]。<br>
+                            [cite_start]<b>注意：</b>如果房产净值 < £175,000，RNRB 限制为房产净值 [cite: 1593]。
+                        </div>
+
+                        <div class="section-title" style="border-color:${c.iht}">C. NRB 的转移</div>
+                        <div class="text-content">如果配偶先去世且没用完 NRB 或 RNRB，未使用的 <b>百分比</b> 可以转移给后去世的配偶。</div>
+
+                        <div class="case-box">
+                            <div class="case-header">🌰 案例 4：最后的遗产</div>
+                            [cite_start]<div class="case-body">情景： Mrs. White 去世，留给孙子一套房 (£400k) 和其他资产 (£200k)。无生前赠予 [cite: 1595]。</div>
+                            <details>
+                                <summary>查看解析</summary>
+                                <div class="ans">Chargeable Estate: £600,000
+Less RNRB: (£175,000) (符合条件)
+Less NRB: (£325,000)
+Taxable: £100,000
+[cite_start]Tax: £100,000 × 40% = £40,000 [cite: 1596-1600]</div>
+                            </details>
+                        </div>
+                    `
+                }
+            },
+            {
+                id: 'iht_5', name: 'Proforma\n计算模板', category: 'IHT', symbolSize: 35, itemStyle: { color: c.iht_sub },
+                info: {
+                    title: '5. 必背计算模板 (Proforma)',
+                    html: `
+                        <div class="section-title" style="border-color:${c.iht}">Step 1: Lifetime Tax (生前税 - 仅 CLT)</div>
+                        <div class="proforma">Transfer Value
+(Less: Exemptions - AE, Marriage)
+= Chargeable Transfer
+(Less: Available NRB - look back 7 years for GCTs)
+[cite_start]= Taxable Amount x 20% (Trustee pays) / 25% (Donor pays) [cite: 1603-1607]</div>
+
+                        <div class="section-title" style="border-color:${c.iht}">Step 2: Death Tax on Lifetime Gifts</div>
+                        <div class="proforma">Gross Chargeable Value (Value at date of gift)
+(Less: NRB at death - look back 7 years from the gift)
+= Taxable x 40%
+(Less: Taper Relief)
+(Less: Lifetime tax paid - only for CLT) [cite_start][cite: 1609-1613]</div>
+
+                        <div class="section-title" style="border-color:${c.iht}">Step 3: Death Estate (遗产税)</div>
+                        <div class="proforma">Total Assets (Probate Value)
+(Less: Debts & Funeral)
+(Less: Exempt Legacies to Spouse)
+= Chargeable Estate
+(Less: RNRB - max £175k)
+(Less: Remaining NRB - £325k minus GCTs in last 7 years)
+[cite_start]= Taxable Estate x 40% [cite: 1615-1621]</div>
+                    `
+                }
+            },
+            {
+                id: 'iht_boss', name: 'IHT BOSS\n综合大题', category: 'IHT', symbolSize: 45, itemStyle: { color: c.boss },
+                info: {
+                    title: '👹 终极 BOSS 战：综合大题',
+                    html: `
+                        <div class="case-box" style="border-color:${c.boss}; background:#fffbf0;">
+                            <div class="case-header" style="color:#e67e22">Mr. Bond 综合题</div>
+                            <div class="case-body"><b>背景：</b> Mr. Bond (UK Domiciled) 于 2026年3月20日 去世。<br>1. 2019年8月1日 (CLT): 向信托转入 £280,000 (Gross)。<br>2. 2021年10月1日 (PET): 送给女儿 £150,000。<br>3. [cite_start]死亡遗产 (Death Estate): 自住房屋 £500,000 (给儿子)，股票 £300,000，债务 £20,000，丧葬费 £5,000 [cite: 1624-1627]。</div>
+                            
+                            <details open>
+                                <summary>查看详细解析</summary>
+                                <div class="ans"><b>第一步：检查生前赠予对 NRB 的占用 (7年累积)</b>
+1. CLT (2019年8月): 价值 £280,000。距离死亡 6-7 年，占用 NRB。
+2. PET (2021年10月): 价值 £150,000。距离死亡 < 7 年，变成 Chargeable，占用 NRB。
+
+<b>NRB 占用计算:</b>
+CLT 用掉了：£280,000
+剩余 NRB：£325,000 - £280,000 = £45,000
+[cite_start]PET 用掉了：£150,000 (PET 吃掉了剩下的 £45,000，并溢出。PET 自己要去交死亡税，但对遗产税计算来说，关键是 <b>NRB 已归零</b>) [cite: 1635-1638]。
+
+[cite_start]<b>第二步：计算遗产税 (Death Estate Tax)</b> [cite: 1640]
+<table class="tax-table">
+<tr><th>项目</th><th>金额 (£)</th><th>说明</th></tr>
+<tr><td>Total Assets</td><td>800,000</td><td>(£500k 房 + £300k 股)</td></tr>
+<tr><td>Less: Liabilities</td><td>(25,000)</td><td>(£20k 债 + £5k 丧葬)</td></tr>
+<tr><td><b>Net Chargeable Estate</b></td><td><b>775,000</b></td><td></td></tr>
+<tr><td>Less: RNRB</td><td>(175,000)</td><td>有自住房且留给儿子，全额扣除</td></tr>
+<tr><td>Less: Remaining NRB</td><td>(0)</td><td><b>核心考点：</b> 生前礼物已将 £325k 耗尽</td></tr>
+<tr><td><b>Taxable Estate</b></td><td><b>600,000</b></td><td></td></tr>
+<tr><td><b>Tax Payable</b></td><td><b>240,000</b></td><td>£600,000 × 40%</td></tr>
+</table>
+[cite_start]<div style="margin-top:10px;font-weight:bold;color:#2c3e50">🎯 最终答案： 遗产税 (IHT) 为 £240,000 [cite: 1641]。</div></div>
+                            </details>
+                        </div>
+                    `
                 }
             },
 
@@ -242,16 +418,16 @@ Tax @ 20% = £15,000</div></details>
                     title: '1. 核心概念与税率 (Basic Principles)',
                     html: `
                         <div class="section-title" style="border-color:${c.cgt}">征税基础</div>
-                        <div class="text-content">征税对象：个人在纳税年度内处置资产产生的 <b>利得 (Profit)</b>。<br>计算基础：基于 <b>Taxable Income</b>。CGT 是“顶”在 Income Tax 之上的。</div>
+                        [cite_start]<div class="text-content">征税对象：个人在纳税年度内处置资产产生的 <b>利得 (Profit)</b> [cite: 1644][cite_start]。<br>计算基础：基于 <b>Taxable Income (应税收入)</b> 来确定税率。CGT 是“顶”在 Income Tax 之上的 [cite: 1645]。</div>
 
                         <div class="section-title" style="border-color:${c.cgt}">关键税率 (2025/26)</div>
                         <div class="rule-card">
                             <div class="text-content">
                                 <ul>
-                                    <li><b>年度豁免 (AEA):</b> <span class="hl-red">£3,000</span> (白给，不交税)。</li>
-                                    <li><b>普通资产 (Normal):</b><br>- Basic Band: 10%<br>- Higher/Add Band: 20%</li>
-                                    <li><b>住宅房产 (Residential):</b><br>- Basic Band: 18%<br>- Higher/Add Band: <span class="hl-red">24%</span> (FA24新规)。</li>
-                                    <li><b>BADR / Investors' Relief:</b> 无论收入多少，一律 10%。</li>
+                                    [cite_start]<li><b>年度豁免 (AEA):</b> <span class="hl-red">£3,000</span> (白给，不交税) [cite: 1647]。</li>
+                                    [cite_start]<li><b>普通资产 (Normal Rates):</b><br>- Basic Band: 10%<br>- Higher/Add Band: 20% [cite: 1648-1650]。</li>
+                                    [cite_start]<li><b>住宅房产 (Residential):</b><br>- Basic Band: 18%<br>- Higher/Add Band: <span class="hl-red">24%</span> [cite: 1651-1653]。</li>
+                                    [cite_start]<li><b>BADR / Investors' Relief:</b> 无论收入多少，一律 10% [cite: 1654-1655]。</li>
                                 </ul>
                             </div>
                         </div>
@@ -269,20 +445,20 @@ Tax @ 20% = £15,000</div></details>
 = Net Proceeds
 (Less: Allowable Cost - 买入价+费用)
 (Less: Enhancement Exp - 增值支出)
-= Chargeable Gain</div>
+[cite_start]= Chargeable Gain [cite: 1659-1667]</div>
 
                         <div class="section-title" style="border-color:${c.cgt}">B. 汇总与纳税 (Tax Liability)</div>
                         <div class="text-content">
-                            1. 汇总所有 Gains。<br>
-                            2. <b>减去 CY Losses (当年亏损):</b> 必须全额抵扣，不能保留。<br>
-                            3. <b>减去 BF Losses (结转亏损):</b> 只减到 Net Gains = AEA (£3,000) 为止，剩下的继续结转 (不要浪费 AEA)。<br>
-                            4. <b>减去 AEA:</b> 总是优先抵扣税率最高的 (如房产 24%)。<br>
-                            5. <b>计算税额:</b> 根据 Income Tax 剩余 Band 分段计算。
+                            1. [cite_start]汇总所有 Gains [cite: 1669]。<br>
+                            2. [cite_start]<b>减去 CY Losses (当年亏损):</b> 必须全额抵扣，不能保留 [cite: 1670]。<br>
+                            3. [cite_start]<b>减去 BF Losses (结转亏损):</b> 只减到 Net Gains = AEA (£3,000) 为止，剩下的继续向后结转 [cite: 1671]。<br>
+                            4. [cite_start]<b>减去 AEA (£3,000):</b> 总是优先抵扣税率最高的 (如房产 24%) [cite: 1672, 1677]。<br>
+                            5. [cite_start]<b>计算税额:</b> 根据 Income Tax 剩余 Band 分段计算 [cite: 1673]。
                         </div>
 
                         <div class="case-box">
                             <div class="case-header">🌰 案例 1：普通资产 vs 房产</div>
-                            <div class="case-body">Jack (Higher Rate) 卖画赚 £10k，卖房赚 £20k。无亏损。</div>
+                            [cite_start]<div class="case-body">情景： Jack 是 Higher Rate Taxpayer。他在 2025/26 卖了一幅画赚了 £10,000，卖了一套投资房产赚了 £20,000。无亏损 [cite: 1675]。</div>
                             <details>
                                 <summary>查看解析</summary>
                                 <div class="ans">1. Taxable Gains:
@@ -292,8 +468,7 @@ AEA 优先抵扣房产 (24% > 20%)。
 2. Tax Payable:
 画: £10,000 x 20% = £2,000
 房: (£20,000 - £3,000) x 24% = £4,080
-
-<b>Total = £6,080</b></div>
+[cite_start]Total = £6,080 [cite: 1676-1682]</div>
                             </details>
                         </div>
                     `
@@ -304,56 +479,52 @@ AEA 优先抵扣房产 (24% > 20%)。
                 info: {
                     title: '3. 特殊资产规则 (Specific Assets)',
                     html: `
-                        <div class="section-title" style="border-color:${c.cgt}">A. 关联方 & 配偶</div>
-                        <div class="text-content">
-                            <b>Connected Persons:</b> 必须用 Market Value 替代实际售价。亏损只能抵扣同一个人。<br>
-                            <b>Spouse:</b> No Gain / No Loss。受赠人继承原始成本。
-                        </div>
+                        <div class="section-title" style="border-color:${c.cgt}">A. 部分处置 (Part Disposals)</div>
+                        [cite_start]<div class="text-content">场景: 买了一大块地，只卖了其中一半 [cite: 1685][cite_start]。<br><b>成本分摊公式:</b> Allowable Cost = Original Cost × A / (A + B) [cite: 1688][cite_start]<br>A = Gross Proceeds (卖出部分的售价) [cite: 1689][cite_start]。<br>B = Market Value of Remainder (剩余部分的市值) [cite: 1690]。</div>
 
-                        <div class="section-title" style="border-color:${c.cgt}">B. 部分处置 (Part Disposal)</div>
-                        <div class="formula-box">Cost = Original Cost × A / (A + B)
-(A=Proceeds, B=MV of Remainder)</div>
-
-                        <div class="section-title" style="border-color:${c.cgt}">C. 动产 (Chattels) - £6k 规则</div>
+                        <div class="section-title" style="border-color:${c.cgt}">B. 动产 (Chattels) - £6k 规则</div>
                         <div class="text-content">
                             <ul>
-                                <li><b>Wasting (<50yr):</b> Exempt。</li>
-                                <li><b>Non-wasting (>50yr):</b>
-                                    <br>- 买卖 < £6k: Exempt。
-                                    <br>- 买卖 > £6k: Normal。
-                                    <br>- 买 < 6k, 卖 > 6k: <b>Marginal Relief</b>。Gain 限制为 5/3 × (Proceeds - 6,000)。
-                                    <br>- 卖 < 6k: Deemed Proceeds = £6k (造Loss)。
+                                [cite_start]<li><b>Wasting (<50yr):</b> Exempt (如赛马) [cite: 1698-1700]。</li>
+                                [cite_start]<li><b>Non-wasting (>50yr):</b> (如古董) [cite: 1702]<br>
+                                    - 买卖 < £6k: Exempt。<br>
+                                    - 买卖 > £6k: Normal。<br>
+                                    - [cite_start]买 < 6k, 卖 > 6k: <b>Marginal Relief</b>。Gain 限制为: 5/3 × (Gross Proceeds - 6,000) [cite: 1709]。<br>
+                                    - [cite_start]卖 < 6k: Deemed Proceeds = £6k (造Loss) [cite: 1713]。
                                 </li>
                             </ul>
                         </div>
 
-                        <div class="section-title" style="border-color:${c.cgt}">D. 股票 (Shares)</div>
+                        <div class="section-title" style="border-color:${c.cgt}">C. 股票 (Shares) - 匹配规则</div>
                         <div class="text-content">
-                            <b>匹配规则:</b> 1. Same Day -> 2. Next 30 Days -> 3. Share Pool (Avg Cost)。<br>
-                            <b>Bonus Issue:</b> No cost, increase num.<br>
-                            <b>Rights Issue:</b> Cost increases, num increases.
+                            [cite_start]<b>顺序:</b> 1. Same Day -> 2. Next 30 Days -> 3. Share Pool (Avg Cost) [cite: 1727-1730]。<br>
+                            [cite_start]<b>Bonus Issue:</b> 增加数量，成本不变 [cite: 1731]。<br>
+                            [cite_start]<b>Rights Issue:</b> 增加数量，增加成本 [cite: 1732]。
                         </div>
-                        <div class="proforma">Share Pool Table:
-| | No. | Cost (£) |
+                        [cite_start]<div class="proforma">Share Pool Calculation (股票池模板)[cite: 1734]:
+|           | Number | Cost (£) |
 | Balance b/f | X | X |
 | (+) Purchase | X | X |
-| (-) Disposal | (X) | (X) (Avg) |</div>
+| (-) Disposal | (X) | (X) (Avg) |
+| Balance c/f | X | X |</div>
                     `
                 }
             },
             {
                 id: 'cgt_4', name: '4. Reliefs\n核心减免', category: 'CGT', symbolSize: 35, itemStyle: { color: c.cgt_sub },
                 info: {
-                    title: '4. 核心减免 (Reliefs)',
+                    title: '4. 核心减免 (Key Reliefs)',
                     html: `
+                        [cite_start]<div class="text-content">Section C 拿分之王 [cite: 1735]。</div>
                         <table class="tax-table">
                             <tr><th>Relief</th><th>Effect</th><th>Conditions</th></tr>
                             <tr><td><b>BADR</b></td><td>10% Rate<br>£1m Limit</td><td>1. 卖生意(Sole/Partner >2yr)<br>2. 卖股份(5%+Emp >2yr)</td></tr>
                             <tr><td><b>Investors</b></td><td>10% Rate<br>£10m Limit</td><td>未上市交易公司; 新股; >3年; 非员工。</td></tr>
-                            <tr><td><b>Rollover</b></td><td>Defer Gain</td><td>卖旧买新 (Qualifying Assets)<br>窗口: -1yr ~ +3yr</td></tr>
+                            <tr><td><b>Rollover</b></td><td>Defer Gain</td><td>卖旧买新 (Qualifying Assets)<br>窗口: -1yr ~ +3yr<br>Business use.</td></tr>
                             <tr><td><b>Gift</b></td><td>Defer to Donee</td><td>商业资产; 联合申请。</td></tr>
-                            <tr><td><b>PPR</b></td><td>Exempt</td><td>自住房; Last 9mo deemed。</td></tr>
+                            <tr><td><b>PPR</b></td><td>Exempt</td><td>自住房<br>Deemed Occupation Rules.</td></tr>
                         </table>
+                        [cite_start]<div style="margin-top:5px;font-size:12px;color:#999">[cite: 1736]</div>
                     `
                 }
             },
@@ -364,7 +535,7 @@ AEA 优先抵扣房产 (24% > 20%)。
                     html: `
                         <div class="case-box" style="border-color:${c.boss}; background:#fffbf0;">
                             <div class="case-header" style="color:#e67e22">Mr. Lucky 综合题</div>
-                            <div class="case-body"><b>背景：</b> Mr. Lucky (Higher Rate) 2025/26 操作：<br>1. 卖古董花瓶: 卖 £8,000, 买 £4,000。<br>2. 卖咖啡店: 赚 £200,000 (符合 BADR)。<br>3. 卖股票: 1000股 @ £5 (2010买500@£1k; 2020买1000@£3k)。<br>4. 其他: BF Loss £500。<br><b>任务:</b> 计算总 CGT。</div>
+                            <div class="case-body"><b>背景：</b> Mr. Lucky (Higher Rate) 2025/26 操作：<br>1. 卖古董花瓶: 卖 £8,000, 买 £4,000。<br>2. 卖咖啡店: 赚 £200,000 (符合 BADR)。<br>3. 卖股票: 1000股 @ £5 (Pool Cost £2.67)。<br>4. [cite_start]其他: BF Loss £500 [cite: 1739-1746]。</div>
                             
                             <details open>
                                 <summary>查看详细解析</summary>
@@ -372,34 +543,27 @@ AEA 优先抵扣房产 (24% > 20%)。
 买 < 6k, 卖 > 6k -> Marginal Relief.
 Normal Gain = 8,000 - 4,000 = £4,000
 Restricted = 5/3 × (8,000 - 6,000) = £3,333
-取小值: <b>Chargeable Gain = £3,333</b>
+[cite_start]取小值: <b>Chargeable Gain = £3,333</b> [cite: 1749-1753]
 
 <b>Step 2: 咖啡店 (Business)</b>
-Gain £200,000. 符合 BADR -> 税率 <b>10%</b>.
+Gain £200,000. [cite_start]符合 BADR -> 税率 <b>10%</b> [cite: 1754-1757].
 
 <b>Step 3: 股票 (Shares)</b>
-Share Pool:
-Total Shares = 500 + 1000 = 1,500
-Total Cost = 1,000 + 3,000 = £4,000
-Avg Cost = 4000 / 1500 = £2.67 / share
-
 Disposal Cost = 1,000 × 2.67 = £2,667
-Proceeds = 1,000 × 5 = £5,000
-Gain = 5,000 - 2,667 = <b>£2,333</b>
+[cite_start]Gain = 5,000 - 2,667 = <b>£2,333</b> [cite: 1758-1762]
 
-<b>Step 4: 汇总计算 (Tax Liability)</b>
-Total Gains = 3,333 + 200,000 + 2,333 = £205,666
-Less: BF Loss (£500)
-Less: AEA (£3,000)
-<b>Taxable Gains = £202,166</b>
-
-<b>Tax Calculation:</b>
-1. BADR (Business): £200,000 @ 10% = <b>£20,000</b>
-2. Remaining (£2,166):
-   Rate: 20% (Higher Rate, Ordinary Assets)
-   Tax = 2,166 × 20% = <b>£433</b>
-
-<b>Total CGT Payable = £20,433</b></div>
+[cite_start]<b>Step 4: 汇总计算 (CGT Computation)</b> [cite: 1764]
+<table class="tax-table">
+<tr><th>Item</th><th>Gain (£)</th><th>Rate</th><th>Tax (£)</th></tr>
+<tr><td>Total Gains</td><td>205,666</td><td></td><td>(3,333+200k+2,333)</td></tr>
+<tr><td>(-) BF Loss</td><td>(500)</td><td></td><td></td></tr>
+<tr><td>(-) AEA</td><td>(3,000)</td><td></td><td></td></tr>
+<tr><td><b>= Taxable</b></td><td><b>202,166</b></td><td></td><td></td></tr>
+<tr><td colspan="4"><b>Tax Calculation:</b></td></tr>
+<tr><td>Business (BADR)</td><td>200,000</td><td>10%</td><td>20,000</td></tr>
+<tr><td>Remaining</td><td>2,166</td><td>20%</td><td>433</td></tr>
+<tr><td><b>Total CGT</b></td><td></td><td></td><td><b>20,433</b></td></tr>
+</table></div>
                             </details>
                         </div>
                     `
@@ -408,11 +572,11 @@ Less: AEA (£3,000)
         ];
 
         const links = [
-            { source: '0', target: 'iht_1' }, { source: 'iht_1', target: 'iht_2' }, { source: 'iht_2', target: 'iht_3' }, { source: 'iht_3', target: 'iht_boss' },
+            { source: '0', target: 'iht_1' }, { source: 'iht_1', target: 'iht_2' }, { source: 'iht_2', target: 'iht_3' }, { source: 'iht_3', target: 'iht_4' }, { source: 'iht_4', target: 'iht_5' }, { source: 'iht_5', target: 'iht_boss' },
             { source: '0', target: 'cgt_1' }, { source: 'cgt_1', target: 'cgt_2' }, { source: 'cgt_2', target: 'cgt_3' }, { source: 'cgt_3', target: 'cgt_4' }, { source: 'cgt_4', target: 'cgt_boss' }
         ];
 
-        // ================= ECharts =================
+        // ================= ECharts 配置 =================
         const option = {
             backgroundColor: 'transparent',
             series: [{
@@ -423,9 +587,9 @@ Less: AEA (£3,000)
                 roam: true,
                 draggable: true,
                 zoom: 0.85,
-                label: { show: true, position: 'bottom', color: '#888', fontSize: 11, fontWeight: '600', formatter: '{b}', distance: 8 },
+                label: { show: true, position: 'bottom', color: '#7f8c8d', fontSize: 11, fontWeight: 'bold', formatter: '{b}', distance: 8 },
                 itemStyle: { borderColor: '#fff', borderWidth: 2 },
-                lineStyle: { color: '#dcdcdc', width: 1.5, curveness: 0.15, opacity: 0.6 },
+                lineStyle: { color: '#dcdcdc', width: 1.5, curveness: 0.2, opacity: 0.8 },
                 force: { repulsion: 450, edgeLength: 100, gravity: 0.06 }
             }]
         };
@@ -433,7 +597,7 @@ Less: AEA (£3,000)
         myChart.setOption(option);
         window.addEventListener('resize', () => myChart.resize());
 
-        // ================= 交互 =================
+        // ================= 交互逻辑 =================
         const mask = document.getElementById('mask');
         const sheet = document.getElementById('sheet');
         const content = document.getElementById('sheetContent');
@@ -458,8 +622,6 @@ Less: AEA (£3,000)
             content.innerHTML = html;
             mask.classList.add('active');
             sheet.classList.add('active');
-            
-            if (window.MathJax) MathJax.typesetPromise();
         }
 
         function closeSheet() {
