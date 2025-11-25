@@ -3,151 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ACCA TX (UK) FA2024 Ultimate Notes</title>
-    <script src="https://cdn.staticfile.org/echarts/5.4.3/echarts.min.js"></script>
+    <title>ACCA TX (UK) FA2024 Ultimate Notes (Full Content)</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
     <style>
-        /* === 1. 基础样式 === */
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; user-select: none; }
-        body { 
-            margin: 0; padding: 0; overflow: hidden; 
-            background-color: #f4f7f6;
-            font-family: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif;
-            touch-action: none; /* 禁用默认手势 */
+        /* === 1. 基础设置 (莫兰迪·晚霞主题) === */
+        :root {
+            /* 莫兰迪色盘 */
+            --col-purple: #a29bfe;   /* CGT主色 */
+            --col-purple-lt: #dcd6f7;
+            --col-green: #95e1d3;    /* IHT主色 */
+            --col-green-lt: #a8e6cf;
+            --col-root: #34495e;
+            --col-boss: #ffb7b2;     /* 珊瑚粉 BOSS */
+            
+            --bg-color: #fdfbf7;     /* 暖米白背景 */
+            --text-main: #2d3436;
+            --text-sub: #636e72;
+            --glass: rgba(255, 255, 255, 0.98);
         }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        body { margin: 0; padding: 0; overflow: hidden; background-color: var(--bg-color); font-family: "Gill Sans", "Segoe UI", sans-serif; }
         #main { width: 100vw; height: 100vh; z-index: 1; }
 
-        /* === 2. 顶部栏 === */
+        /* 顶部栏 */
         .header {
-            position: fixed; top: 0; left: 0; right: 0; height: 55px;
-            background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);
+            position: fixed; top: 0; left: 0; right: 0; height: 50px;
+            background: rgba(253, 251, 247, 0.85); backdrop-filter: blur(8px);
             border-bottom: 1px solid rgba(0,0,0,0.05); z-index: 10;
             display: flex; align-items: center; justify-content: center;
-            pointer-events: none;
         }
-        .header h1 { 
-            font-size: 16px; color: #2c3e50; font-weight: 800; margin: 0; 
-            pointer-events: auto;
-        }
-        .badge { background: #2c3e50; color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-left: 8px; }
+        .header h1 { font-size: 16px; color: var(--text-main); font-weight: 800; letter-spacing: 1px; margin: 0; }
 
-        /* === 3. 底部详情弹窗 (尺寸适配核心修改) === */
+        /* === 2. 详情面板 (PC/Mobile 完美适配) === */
         .mask {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.3); z-index: 99; 
-            display: none; opacity: 0; transition: opacity 0.2s;
+            background: rgba(45, 52, 54, 0.2); z-index: 99; 
+            display: none; opacity: 0; transition: opacity 0.3s;
         }
         .mask.active { display: block; opacity: 1; }
 
         .sheet {
             position: fixed; bottom: 0; left: 0; right: 0;
-            background: #fff; z-index: 100;
-            border-top-left-radius: 24px; border-top-right-radius: 24px;
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.15);
+            background: var(--glass); z-index: 100;
+            box-shadow: 0 -10px 60px rgba(0,0,0,0.1);
+            border-radius: 24px 24px 0 0;
+            display: flex; flex-direction: column;
             transform: translateY(110%); 
-            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-            display: flex; flex-direction: column; 
-            /* 默认移动端高度 */
+            transition: transform 0.35s cubic-bezier(0.19, 1, 0.22, 1);
+            
+            /* 📱 移动端默认高度 */
             max-height: 85vh; 
         }
 
-        /* --- 💻 电脑端/平板端 尺寸适配优化 --- */
+        /* 💻 电脑端适配：限制宽度，居中显示，防止太宽难看 */
         @media (min-width: 768px) {
             .sheet {
-                /* 电脑端：高度增加至 92%，提供沉浸式阅读体验 */
-                max-height: 92vh; 
-                /* 边框微调 */
-                border-top: 1px solid #e0e0e0;
+                left: 50%; transform: translateX(-50%) translateY(110%);
+                width: 700px; /* 黄金阅读宽度 */
+                max-height: 90vh;
+                border: 1px solid #eee;
             }
-            /* 电脑端：内容容器加宽 */
-            .content-container {
-                max-width: 1000px !important; /* 从800px增加到1000px */
-            }
+            .sheet.active { transform: translateX(-50%) translateY(0); }
         }
-        /* ------------------------------------- */
-
-        .sheet.active { transform: translateY(0); }
+        /* 📱 移动端激活状态 */
+        @media (max-width: 767px) {
+            .sheet.active { transform: translateY(0); }
+        }
 
         /* 头部 */
         .sheet-head {
-            padding: 18px 20px; border-bottom: 1px solid #eee;
+            padding: 20px 30px; border-bottom: 1px solid rgba(0,0,0,0.05);
             display: flex; justify-content: space-between; align-items: center;
-            flex-shrink: 0; background: #fff; border-radius: 24px 24px 0 0;
+            flex-shrink: 0;
         }
-        .sheet-title { font-size: 18px; font-weight: 700; color: #2c3e50; margin: 0; }
-        .close-btn { 
-            font-size: 24px; color: #999; width: 32px; height: 32px;
-            display: flex; align-items: center; justify-content: center;
-            background: #f5f5f5; border-radius: 50%; cursor: pointer;
-        }
+        .sheet-title { font-size: 20px; font-weight: 700; color: var(--text-main); margin: 0; display: flex; align-items: center; }
+        .close-btn { font-size: 26px; color: #b2bec3; cursor: pointer; transition: color 0.2s; }
+        .close-btn:hover { color: var(--col-boss); }
 
         /* 内容区 */
-        .sheet-body { 
-            padding: 0; /* Padding交给内部容器控制 */
-            overflow-y: auto; -webkit-overflow-scrolling: touch; 
-            width: 100%;
-        }
+        .sheet-body { padding: 0 30px 40px 30px; overflow-y: auto; -webkit-overflow-scrolling: touch; flex: 1; }
+
+        /* === 3. 内容组件 (笔记还原) === */
         
-        /* 内容限制容器 (用于在大屏居中内容) */
-        .content-container {
-            max-width: 800px; /* 移动端默认宽度 */
-            margin: 0 auto; 
-            padding: 20px 24px 50px 24px;
-        }
-
-        /* === 4. 内容排版组件 (笔记还原) === */
+        /* 章节标题 */
         .section-title {
-            font-size: 14px; font-weight: 800; color: #333; 
-            margin: 25px 0 10px 0; padding-left: 10px;
-            border-left: 4px solid #ccc; /* JS会修改颜色 */
-            text-transform: uppercase; letter-spacing: 0.5px;
+            font-size: 13px; font-weight: 800; color: var(--text-main); 
+            margin: 25px 0 12px 0; text-transform: uppercase; letter-spacing: 1px;
+            display: flex; align-items: center;
         }
-        .section-title:first-child { margin-top: 0; }
+        .section-title::before { content:''; width:4px; height:14px; background:#ccc; margin-right:8px; border-radius:2px; }
 
-        .text-content { font-size: 15px; line-height: 1.7; color: #555; text-align: justify; margin-bottom: 15px; }
+        /* 文本 */
+        .text-content { font-size: 15px; line-height: 1.7; color: #555; text-align: justify; }
         .text-content b { color: #2c3e50; }
-        .text-content ul { padding-left: 18px; margin: 5px 0; }
+        .text-content ul { padding-left: 18px; margin: 8px 0; }
         .text-content li { margin-bottom: 6px; }
 
-        /* 规则/税率卡片 */
+        /* 规则卡片 */
         .rule-card {
-            background: #f8f9fa; border: 1px solid #eee; border-radius: 8px;
-            padding: 15px; margin-bottom: 15px;
+            background: #fff; border: 1px solid #f0f0f0; border-radius: 10px;
+            padding: 15px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.02);
         }
         
         /* 案例盒子 */
         .case-box {
-            background: #fffbf0; border: 1px solid #fcefd0; border-radius: 8px;
-            padding: 15px; margin-top: 15px;
+            background: #fffbf5; border-left: 4px solid var(--col-boss); border-radius: 0 8px 8px 0;
+            padding: 15px; margin-top: 20px;
         }
         .case-header { font-weight: 700; color: #d35400; font-size: 14px; margin-bottom: 8px; }
-        .case-body { font-size: 14px; color: #2d3436; line-height: 1.6; white-space: pre-wrap; }
+        .case-body { font-size: 14px; color: #444; white-space: pre-wrap; font-family: -apple-system, sans-serif; line-height: 1.6; }
 
-        /* Proforma 代码块 */
-        .proforma {
-            background: #2d3436; color: #ecf0f1; padding: 15px; border-radius: 8px;
-            font-family: monospace; font-size: 12px; line-height: 1.5; white-space: pre-wrap;
-            margin-bottom: 15px; border-left: 4px solid #f1c40f;
+        /* Proforma / 算式 */
+        .formula-box {
+            background: #f4f8fb; border: 1px solid #e1eef6; color: #2980b9;
+            padding: 10px; border-radius: 6px; font-family: "Menlo", monospace; font-size: 13px; margin: 5px 0;
         }
+
+        /* 折叠解析 */
+        details { margin-top: 10px; border-top: 1px dashed #e0e0e0; padding-top: 10px; }
+        summary { font-size: 13px; font-weight: 600; color: #7f8c8d; cursor: pointer; list-style:none; display:flex; justify-content:space-between; }
+        summary::after { content: '▼ 解析'; color: #aaa; }
+        details[open] summary::after { content: '▲ 收起'; }
+        .ans { margin-top:10px; padding:15px; background:#f9f9f9; border-radius:6px; font-family:monospace; font-size:13px; line-height:1.6; white-space: pre-wrap; color: #333; }
 
         /* 表格 */
         .tax-table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 10px 0; background:#fff; }
-        .tax-table th { background: #eee; padding: 8px; text-align: left; border:1px solid #ddd; }
-        .tax-table td { border: 1px solid #ddd; padding: 8px; }
+        .tax-table th { background: #f4f4f4; padding: 8px; text-align: left; border:1px solid #ddd; color:#333; font-weight:700; }
+        .tax-table td { border: 1px solid #ddd; padding: 8px; color:#555; vertical-align: top; }
 
-        /* 折叠解析 */
-        details { margin-top: 10px; }
-        summary { color: #3498db; font-weight: 600; cursor: pointer; list-style:none; font-size:13px; }
-        .ans { margin-top:10px; padding:10px; background:#fff; border:1px solid #eee; border-radius:6px; font-family:monospace; font-size:13px; }
-        
         /* 高亮 */
-        .hl { color: #c0392b; font-weight: bold; }
+        .hl-red { color: #e74c3c; font-weight: bold; }
+        .hl-bg { background: #e8f6f3; padding: 2px 4px; border-radius: 3px; color: #16a085; font-weight: bold; }
 
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h1>TX (UK) <span class="badge">FA2024 Note</span></h1>
+        <h1>TX (UK) Full Notes</h1>
     </div>
 
     <div id="main"></div>
@@ -158,370 +152,208 @@
             <div class="sheet-title" id="sheetTitle">Topic</div>
             <div class="close-btn" onclick="closeSheet()">×</div>
         </div>
-        <div class="sheet-body">
-            <div class="content-container" id="sheetContent"></div>
-        </div>
+        <div class="sheet-body" id="sheetContent"></div>
     </div>
 
     <script type="text/javascript">
         var chartDom = document.getElementById('main');
         var myChart = echarts.init(chartDom, null, {renderer: 'canvas'});
 
-        // ================= 配色定义 (莫兰迪双色) =================
+        // ================= 配色定义 =================
         const c = {
-            iht: '#1abc9c',    // 薄荷绿
-            iht_sub: '#a8e6cf',
-            cgt: '#a29bfe',    // 暮山紫
+            iht: '#95e1d3',    // IHT 主色
+            iht_sub: '#dcedc1',
+            cgt: '#a29bfe',    // CGT 主色
             cgt_sub: '#dcd6f7',
             root: '#34495e',
-            boss: '#e67e22'
+            boss: '#ffb7b2'
         };
 
-        // ================= 完整笔记内容库 (1:1 还原) =================
+        // ================= 完整笔记数据库 (1:1 还原) =================
         const data = [
-            {
-                id: 'root', name: 'ACCA TX\n(UK)', category: 'ROOT', symbolSize: 55, itemStyle: { color: c.root },
-                info: { title: '核心复习体系', html: `<div class="text-content">包含 IHT (遗产税) 和 CGT (资本利得税) 两大模块的完整复习笔记。<br>数据基于 FA2024 (25/26 考季)。</div>` }
-            },
+            // --- Root ---
+            { id: '0', name: 'ACCA TX\n(UK)', category: 'ROOT', symbolSize: 55, itemStyle: { color: c.root }, info: { def: 'FA2024 完整笔记 (IHT + CGT)。<br>点击分支查看详细讲义。' } },
 
-            // ======================= IHT 模块 =======================
+            // ==================== IHT 模块 (Legacy Data) ====================
             {
-                id: 'iht_1', name: '1. Principles\n核心概念', category: 'IHT', symbolSize: 40, itemStyle: { color: c.iht },
+                id: 'iht_1', name: 'IHT\n原理', category: 'IHT', symbolSize: 40, itemStyle: { color: c.iht },
                 info: {
-                    title: '1. 核心概念与税率 (Basic Principles)',
+                    title: '1. 核心概念与税率',
                     html: `
                         <div class="section-title" style="border-color:${c.iht}">征税基础</div>
-                        <div class="text-content">IHT 是基于 <b>价值转移 (Transfer of Value)</b>，即捐赠导致捐赠者财富减少的金额 (Diminution in value)。</div>
-                        
-                        <div class="section-title" style="border-color:${c.iht}">纳税人身份</div>
-                        <div class="text-content">
-                            <ul>
-                                <li><b>UK Domiciled (英国居籍):</b> 对全球资产征税。</li>
-                                <li><b>Non-UK Domiciled (非英国居籍):</b> 仅对英国资产征税。</li>
-                            </ul>
-                        </div>
-
-                        <div class="section-title" style="border-color:${c.iht}">关键税率 (2025/26)</div>
+                        <div class="text-content">IHT 基于 <b>价值转移 (Transfer of Value)</b>，即捐赠导致捐赠者财富减少的金额 (Diminution in value)。</div>
+                        <div class="section-title" style="border-color:${c.iht}">关键税率 (25/26)</div>
                         <div class="rule-card">
-                            <div class="text-content">
-                                <b>Nil Rate Band (NRB):</b> £325,000<br>
-                                <b>Residence Nil Rate Band (RNRB):</b> £175,000<br>
-                                <b>Death Rate:</b> 40%<br>
-                                <b>Lifetime Rate:</b> 20% (受赠人付) 或 25% (捐赠人付)
-                            </div>
+                            <b>Nil Rate Band (NRB):</b> £325,000<br>
+                            <b>Residence NRB (RNRB):</b> £175,000<br>
+                            <b>Death Rate:</b> 40%<br>
+                            <b>Lifetime Rate:</b> 20% (Trustee) / 25% (Donor)
                         </div>
                     `
                 }
             },
             {
-                id: 'iht_2', name: '2. Lifetime\n生前转移', category: 'IHT', symbolSize: 35, itemStyle: { color: c.iht_sub },
+                id: 'iht_2', name: 'Lifetime\n生前转移', category: 'IHT', symbolSize: 35, itemStyle: { color: c.iht_sub },
                 info: {
                     title: '2. 生前转移 (Lifetime Transfers)',
                     html: `
-                        <div class="text-content">生前的礼物分为三类，处理方式截然不同。</div>
-
-                        <div class="section-title" style="border-color:${c.iht}">A. 豁免转移 (Exempt Transfers)</div>
+                        <div class="section-title" style="border-color:${c.iht}">A. 豁免转移 (Exempt)</div>
                         <div class="text-content">
-                            无论生前还是死后，永远不征税。
                             <ul>
-                                <li><b>Spouse/Civil Partner:</b> 无限额豁免。</li>
-                                <li><b>Annual Exemption (AE):</b> 每年 £3,000。当年没用完可向后结转 1 年 (FIFO原则)。</li>
-                                <li><b>Small Gifts:</b> 每人每年 £250 (若超过则全额不豁免)。</li>
-                                <li><b>Marriage Exemption:</b> 父母 £5,000，祖父母 £2,500，其他人 £1,000。</li>
-                                <li><b>Normal expenditure:</b> 必须证明是习惯性的且不影响生活水平。</li>
+                                <li><b>Spouse:</b> 无限额豁免。</li>
+                                <li><b>AE (年免):</b> £3,000 (FIFO, 可结转1年)。</li>
+                                <li><b>Small Gifts:</b> £250 (每人每年)。</li>
+                                <li><b>Marriage:</b> 父母£5k, 祖父母£2.5k, 其他£1k。</li>
                             </ul>
                         </div>
-                        <div class="case-box">
-                            <div class="case-header">🌰 案例 1：精打细算的爷爷</div>
-                            <div class="case-body">Grandpa 在 2024年5月送给孙子 £8,000 结婚礼物。上一税年未做赠予。</div>
-                            <details>
-                                <summary>查看解析</summary>
-                                <div class="ans">Transfer Value: £8,000
-(-) Marriage Exemption: (£2,500) (祖父母)
-(-) AE (Current Year): (£3,000)
-(-) AE (Brought Forward): (£2,500) (上年结转)
-= Chargeable Value: £0 (完全豁免)</div>
-                            </details>
-                        </div>
-
-                        <div class="section-title" style="border-color:${c.iht}">B. PET (潜在豁免转移)</div>
+                        <div class="section-title" style="border-color:${c.iht}">B. PET & CLT</div>
                         <div class="text-content">
-                            个人送给个人的礼物。<br>
-                            • 生前：不交税。<br>
-                            • 后果：活过 7 年完全豁免；7 年内死亡变成 Chargeable，需补交死亡税。
-                        </div>
-
-                        <div class="section-title" style="border-color:${c.iht}">C. CLT (应税生前转移)</div>
-                        <div class="text-content">
-                            个人送给信托 (Trust) 的礼物。<br>
-                            • 生前：立即交税。<br>
-                            • 计算：(Value - Exempt - NRB) x 20% (Trustee) 或 25% (Donor)。<br>
-                            • <b>7年累积原则：</b>计算剩余 NRB 时，扣除该礼物<b>之前 7 年内</b>的所有 GCT。<br>
-                            • 后果：7 年内死亡需重算死亡税。
+                            <b>PET (个人):</b> 生前不交税。活过7年免税。<br>
+                            <b>CLT (信托):</b> 立即交税 20%。7年累积原则。
                         </div>
                         <div class="case-box">
-                            <div class="case-header">🌰 案例 2：富豪的信托 (生前税)</div>
-                            <div class="case-body">Mr. Rich 向信托转入 £400,000 (CLT)。此前7年内无 CLT，只有一个 PET。</div>
-                            <details>
-                                <summary>查看解析</summary>
-                                <div class="ans">Gross Chargeable Transfer: £400,000
-Less NRB: (£325,000) (PET不占生前NRB)
-Taxable Amount: £75,000
-Lifetime Tax: £75,000 × 20% = £15,000</div>
-                            </details>
-                        </div>
-                    `
-                }
-            },
-            {
-                id: 'iht_3', name: '3. Death Tax\n死后追溯', category: 'IHT', symbolSize: 35, itemStyle: { color: c.iht_sub },
-                info: {
-                    title: '3. 死亡时的额外税',
-                    html: `
-                        <div class="text-content">当捐赠人在送礼后 7 年内死亡，之前的 PET 和 CLT 需要拉回来重算一次税。</div>
-
-                        <div class="section-title" style="border-color:${c.iht}">计算步骤</div>
-                        <div class="text-content">
-                            1. <b>查找:</b> 找出死前 7 年内的所有 PET 和 CLT。<br>
-                            2. <b>NRB 扣除:</b> 使用死亡时的 NRB (£325,000)，减去该礼物<b>再往前推 7 年</b>累积的 GCT。<br>
-                            3. <b>计算税额:</b> 剩余部分 × 40%。
-                        </div>
-
-                        <div class="section-title" style="border-color:${c.iht}">Taper Relief (递减减免)</div>
-                        <div class="text-content">
-                            如果在送礼后活得够久，税额可以打折：<br>
-                            • 3-4年: 8折 (20% reduction)<br>
-                            • 4-5年: 6折 (40% reduction)<br>
-                            • 5-6年: 4折 (60% reduction)<br>
-                            • 6-7年: 2折 (80% reduction)
-                        </div>
-
-                        <div class="section-title" style="border-color:${c.iht}">Credit</div>
-                        <div class="text-content">对于 CLT，减去生前已经交过的 20% 税。</div>
-
-                        <div class="case-box">
-                            <div class="case-header">🌰 案例 3：不幸的富豪 (死后追溯)</div>
-                            <div class="case-body">接案例2，Mr. Rich 在送出 £100,000 PET 的 4.5 年后去世。</div>
-                            <details>
-                                <summary>查看解析</summary>
-                                <div class="ans">Gross Value: £100,000
-Available NRB: £325,000 (该 PET 前 7 年无礼物)
-Tax Payable: £0
-(注意：虽然没交税，但这 £100k 吃掉了 NRB 额度，影响后续遗产税)</div>
-                            </details>
-                        </div>
-                    `
-                }
-            },
-            {
-                id: 'iht_4', name: '4. Estate\n死亡遗产', category: 'IHT', symbolSize: 35, itemStyle: { color: c.iht_sub },
-                info: {
-                    title: '4. 死亡遗产税 (Death Estate)',
-                    html: `
-                        <div class="text-content">对死者去世时拥有的所有资产征税。</div>
-
-                        <div class="section-title" style="border-color:${c.iht}">A. 遗产估值</div>
-                        <div class="text-content">
-                            资产按<b>市价 (Probate Value)</b> 计算。<br>
-                            <b>扣除:</b> 债务、未付税款、丧葬费。<br>
-                            <b>豁免:</b> 留给配偶 (Spouse) 的遗产完全免税。
-                        </div>
-
-                        <div class="section-title" style="border-color:${c.iht}">B. 居住零税率带 (RNRB)</div>
-                        <div class="text-content">
-                            <b>金额:</b> £175,000。<br>
-                            <b>条件:</b> 遗产中包含<b>主居所</b> 且 留给<b>直系后代</b> (子女/孙子女)。<br>
-                            <b>限制:</b> 如果房产净值 < £175k，RNRB 限制为房产净值。
-                        </div>
-
-                        <div class="section-title" style="border-color:${c.iht}">C. NRB 的转移</div>
-                        <div class="text-content">如果配偶先去世且没用完 NRB 或 RNRB，未使用的百分比可以转移给后去世的配偶。</div>
-
-                        <div class="case-box">
-                            <div class="case-header">🌰 案例 4：最后的遗产</div>
-                            <div class="case-body">Mrs. White 去世，留给孙子一套房 (£400k) 和其他资产 (£200k)。无生前赠予。</div>
-                            <details>
-                                <summary>查看解析</summary>
-                                <div class="ans">Chargeable Estate: £600,000
-Less RNRB: (£175,000) (符合条件)
+                            <div class="case-header">🌰 案例：富豪的信托 (CLT)</div>
+                            <div class="case-body">转入信托 £400,000。此前7年无 CLT。</div>
+                            <details><summary>解析</summary><div class="ans">Chargeable: £400,000
 Less NRB: (£325,000)
-Taxable: £100,000
-Tax: £100,000 × 40% = £40,000</div>
-                            </details>
+Taxable: £75,000
+Tax @ 20% = £15,000</div></details>
                         </div>
                     `
                 }
             },
             {
-                id: 'iht_5', name: '5. Proforma\n计算模板', category: 'IHT', symbolSize: 35, itemStyle: { color: c.iht_sub },
-                info: {
-                    title: '5. 必背计算模板',
-                    html: `
-                        <div class="section-title" style="border-color:${c.iht}">Step 1: Lifetime Tax (CLT)</div>
-                        <div class="proforma">Transfer Value
-(Less: Exemptions - AE, Marriage)
-= Chargeable Transfer
-(Less: Available NRB - look back 7 years)
-= Taxable Amount x 20% (Trustee) or 25% (Donor)</div>
-
-                        <div class="section-title" style="border-color:${c.iht}">Step 2: Death Tax on Gifts</div>
-                        <div class="proforma">Gross Chargeable Value (Value at date of gift)
-(Less: NRB at death - look back 7 yrs from gift)
-= Taxable x 40%
-(Less: Taper Relief)
-(Less: Lifetime tax paid - only for CLT)</div>
-
-                        <div class="section-title" style="border-color:${c.iht}">Step 3: Death Estate</div>
-                        <div class="proforma">Total Assets (Probate Value)
-(Less: Debts & Funeral)
-(Less: Exempt Legacies to Spouse)
-= Chargeable Estate
-(Less: RNRB - max £175k)
-(Less: Remaining NRB - £325k minus GCTs in last 7 years)
-= Taxable Estate x 40%</div>
-                    `
-                }
+                id: 'iht_3', name: 'Death Tax\n死后追溯', category: 'IHT', symbolSize: 35, itemStyle: { color: c.iht_sub },
+                info: { title: '3. 死亡额外税', html: `<div class="text-content">死前 7 年内的 PET/CLT 需重算。<br><b>Taper Relief:</b> 3-7年税额打折 (20%-80% off)。<br><b>Credit:</b> 减去已交生前税。</div>` }
             },
             {
-                id: 'iht_boss', name: 'IHT BOSS\n综合大题', category: 'IHT', symbolSize: 45, itemStyle: { color: c.boss },
+                id: 'iht_boss', name: 'IHT BOSS\n综合题', category: 'IHT', symbolSize: 45, itemStyle: { color: c.boss },
                 info: {
-                    title: '👹 终极 BOSS 战',
-                    html: `
-                        <div class="case-box" style="border-color:${c.boss}; background:#fffbf0;">
-                            <div class="case-header" style="color:#e67e22">Mr. Bond 综合题</div>
-                            <div class="case-body"><b>背景：</b> Mr. Bond (UK Domiciled) 于 2026年3月20日 去世。<br>1. 2019年8月1日 (CLT): 向信托转入 £280,000 (Gross)。<br>2. 2021年10月1日 (PET): 送给女儿 £150,000。<br>3. 死亡遗产: 自住房屋 £500,000 (给儿子)，股票 £300,000，债务 £20,000，丧葬费 £5,000。</div>
-                            
-                            <details open>
-                                <summary>查看详细解析</summary>
-                                <div class="ans"><b>第一步：检查生前赠予对 NRB 的占用</b>
-1. CLT (2019年8月): 价值 £280,000。
-   死前 6-7 年，占用 NRB。
-   剩余 NRB = 325k - 280k = £45,000。
-
-2. PET (2021年10月): 价值 £150,000。
-   死前 < 7 年，变成 Chargeable。
-   PET 吃掉了剩下的 £45,000 并溢出。
-   <b>结论：死亡时，NRB 已归零 (0)。</b>
-
-<b>第二步：计算遗产税 (Death Estate Tax)</b>
-Total Assets: £800,000 (£500k+£300k)
-Less: Liabilities: (£25,000) (£20k+£5k)
-<b>Net Chargeable Estate: £775,000</b>
-
-Less: RNRB: (£175,000) (自住房留给儿子，全额扣除)
-Less: Remaining NRB: (£0) (被生前礼物耗尽)
-
-<b>Taxable Estate: £600,000</b>
-<b>Tax Payable: £600,000 × 40% = £240,000</b></div>
-                            </details>
-                        </div>
-                    `
+                    isBoss: true, title: '👹 IHT 终极战：NRB 耗尽',
+                    scen: 'Mr. Bond (2026死)。\n1. 2019 CLT £280k\n2. 2021 PET £150k\n3. Estate £800k (房给儿)。',
+                    ans: '1. CLT占£280k。剩45k。\n2. PET吃掉45k并溢出。\n3. 死时NRB=0。\n4. Tax=(£775k-£175k)*40% = £240k。'
                 }
             },
 
-            // ======================= CGT 模块 =======================
+            // ==================== CGT 模块 (Full Content) ====================
             {
-                id: 'cgt_1', name: '1. Basic\n核心概念', category: 'CGT', symbolSize: 50, itemStyle: { color: c.cgt },
+                id: 'cgt_1', name: 'CGT\n核心概念', category: 'CGT', symbolSize: 40, itemStyle: { color: c.cgt },
                 info: {
                     title: '1. 核心概念与税率 (Basic Principles)',
                     html: `
-                        <div class="text-content">征税对象：个人在纳税年度内处置资产产生的 <b>利得 (Profit)</b>。<br>计算基础：基于 Taxable Income 确定税率，CGT 是“顶”在 Income Tax 之上的。</div>
+                        <div class="section-title" style="border-color:${c.cgt}">征税基础</div>
+                        <div class="text-content">征税对象：个人在纳税年度内处置资产产生的 <b>利得 (Profit)</b>。<br>计算基础：基于 <b>Taxable Income</b>。CGT 是“顶”在 Income Tax 之上的。</div>
 
                         <div class="section-title" style="border-color:${c.cgt}">关键税率 (2025/26)</div>
                         <div class="rule-card">
                             <div class="text-content">
-                                <b>年度豁免 (AEA):</b> £3,000<br>
-                                <b>普通资产 (Normal):</b> 10% (Basic) / 20% (Higher)<br>
-                                <b>住宅房产 (Residential):</b> 18% (Basic) / <span class="hl-red">24%</span> (Higher)<br>
-                                <b>BADR:</b> 一律 10%
+                                <ul>
+                                    <li><b>年度豁免 (AEA):</b> <span class="hl-red">£3,000</span> (白给，不交税)。</li>
+                                    <li><b>普通资产 (Normal):</b><br>- Basic Band: 10%<br>- Higher/Add Band: 20%</li>
+                                    <li><b>住宅房产 (Residential):</b><br>- Basic Band: 18%<br>- Higher/Add Band: <span class="hl-red">24%</span> (FA24新规)。</li>
+                                    <li><b>BADR / Investors' Relief:</b> 无论收入多少，一律 10%。</li>
+                                </ul>
                             </div>
                         </div>
                     `
                 }
             },
             {
-                id: 'cgt_2', name: '2. Compute\n计算框架', category: 'CGT', symbolSize: 40, itemStyle: { color: c.cgt_sub },
+                id: 'cgt_2', name: '2. Compute\n计算框架', category: 'CGT', symbolSize: 35, itemStyle: { color: c.cgt_sub },
                 info: {
-                    title: '2. 基础计算框架 (General Computation)',
+                    title: '2. 基础计算框架 (Computation)',
                     html: `
-                        <div class="section-title" style="border-color:${c.cgt}">A. 计算模板</div>
-                        <div class="proforma">Gross Proceeds
-(Less: Incidental costs)
+                        <div class="section-title" style="border-color:${c.cgt}">A. 计算模板 (Proforma)</div>
+                        <div class="proforma">Gross Proceeds (售价/MV)
+(Less: Incidental costs - 销售费用)
 = Net Proceeds
-(Less: Allowable Cost)
-(Less: Enhancement Exp)
+(Less: Allowable Cost - 买入价+费用)
+(Less: Enhancement Exp - 增值支出)
 = Chargeable Gain</div>
 
-                        <div class="section-title" style="border-color:${c.cgt}">B. 汇总与纳税</div>
+                        <div class="section-title" style="border-color:${c.cgt}">B. 汇总与纳税 (Tax Liability)</div>
                         <div class="text-content">
                             1. 汇总所有 Gains。<br>
-                            2. 减去 CY Losses (必须全抵)。<br>
-                            3. 减去 BF Losses (抵到 AEA 为止)。<br>
-                            4. 减去 AEA (£3,000)。<br>
-                            5. 剩余 Taxable Gains 分段计算税额。
+                            2. <b>减去 CY Losses (当年亏损):</b> 必须全额抵扣，不能保留。<br>
+                            3. <b>减去 BF Losses (结转亏损):</b> 只减到 Net Gains = AEA (£3,000) 为止，剩下的继续结转 (不要浪费 AEA)。<br>
+                            4. <b>减去 AEA:</b> 总是优先抵扣税率最高的 (如房产 24%)。<br>
+                            5. <b>计算税额:</b> 根据 Income Tax 剩余 Band 分段计算。
                         </div>
 
                         <div class="case-box">
                             <div class="case-header">🌰 案例 1：普通资产 vs 房产</div>
-                            <div class="case-body">Jack (Higher Rate) 2025/26 卖画赚 £10k，卖房赚 £20k。无亏损。</div>
+                            <div class="case-body">Jack (Higher Rate) 卖画赚 £10k，卖房赚 £20k。无亏损。</div>
                             <details>
                                 <summary>查看解析</summary>
-                                <div class="ans">Taxable Gains = (£10k + £20k) - £3,000 = £27,000
-策略：AEA 优先抵扣高税率 (房产 24%)。
+                                <div class="ans">1. Taxable Gains:
+(£10k + £20k) - £3,000 (AEA) = £27,000
+AEA 优先抵扣房产 (24% > 20%)。
 
-Tax:
-画 (£10,000) x 20% = £2,000
-房产 (£17,000) x 24% = £4,080
-Total = £6,080</div>
+2. Tax Payable:
+画: £10,000 x 20% = £2,000
+房: (£20,000 - £3,000) x 24% = £4,080
+
+<b>Total = £6,080</b></div>
                             </details>
                         </div>
                     `
                 }
             },
             {
-                id: 'cgt_3', name: '3. Assets\n特殊资产', category: 'CGT', symbolSize: 40, itemStyle: { color: c.cgt_sub },
+                id: 'cgt_3', name: '3. Assets\n特殊资产', category: 'CGT', symbolSize: 35, itemStyle: { color: c.cgt_sub },
                 info: {
                     title: '3. 特殊资产规则 (Specific Assets)',
                     html: `
-                        <div class="section-title" style="border-color:${c.cgt}">A. 动产 (Chattels) - £6k 规则</div>
+                        <div class="section-title" style="border-color:${c.cgt}">A. 关联方 & 配偶</div>
                         <div class="text-content">
-                            • <b>Wasting (<50yr):</b> 豁免。<br>
-                            • <b>Non-wasting (>50yr):</b><br>
-                            - 买卖 < 6k: 豁免。<br>
-                            - 买 < 6k, 卖 > 6k: <b>Marginal Relief</b>。Gain 限制为 5/3 x (Proceeds - 6,000)。
+                            <b>Connected Persons:</b> 必须用 Market Value 替代实际售价。亏损只能抵扣同一个人。<br>
+                            <b>Spouse:</b> No Gain / No Loss。受赠人继承原始成本。
                         </div>
 
-                        <div class="section-title" style="border-color:${c.cgt}">B. 股票 (Shares)</div>
-                        <div class="text-content">匹配规则：1. Same Day -> 2. Next 30 Days -> 3. Share Pool (均价)。</div>
-                        
-                        <div class="proforma">Share Pool:
-| Number | Cost |
-| Balance b/f |
-| (+) Purchase |
-| (-) Disposal (Avg Cost) |</div>
+                        <div class="section-title" style="border-color:${c.cgt}">B. 部分处置 (Part Disposal)</div>
+                        <div class="formula-box">Cost = Original Cost × A / (A + B)
+(A=Proceeds, B=MV of Remainder)</div>
+
+                        <div class="section-title" style="border-color:${c.cgt}">C. 动产 (Chattels) - £6k 规则</div>
+                        <div class="text-content">
+                            <ul>
+                                <li><b>Wasting (<50yr):</b> Exempt。</li>
+                                <li><b>Non-wasting (>50yr):</b>
+                                    <br>- 买卖 < £6k: Exempt。
+                                    <br>- 买卖 > £6k: Normal。
+                                    <br>- 买 < 6k, 卖 > 6k: <b>Marginal Relief</b>。Gain 限制为 5/3 × (Proceeds - 6,000)。
+                                    <br>- 卖 < 6k: Deemed Proceeds = £6k (造Loss)。
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="section-title" style="border-color:${c.cgt}">D. 股票 (Shares)</div>
+                        <div class="text-content">
+                            <b>匹配规则:</b> 1. Same Day -> 2. Next 30 Days -> 3. Share Pool (Avg Cost)。<br>
+                            <b>Bonus Issue:</b> No cost, increase num.<br>
+                            <b>Rights Issue:</b> Cost increases, num increases.
+                        </div>
+                        <div class="proforma">Share Pool Table:
+| | No. | Cost (£) |
+| Balance b/f | X | X |
+| (+) Purchase | X | X |
+| (-) Disposal | (X) | (X) (Avg) |</div>
                     `
                 }
             },
             {
-                id: 'cgt_4', name: '4. Reliefs\n核心减免', category: 'CGT', symbolSize: 40, itemStyle: { color: c.cgt_sub },
+                id: 'cgt_4', name: '4. Reliefs\n核心减免', category: 'CGT', symbolSize: 35, itemStyle: { color: c.cgt_sub },
                 info: {
-                    title: '4. 核心减免 (Key Reliefs)',
+                    title: '4. 核心减免 (Reliefs)',
                     html: `
-                        <div class="section-title" style="border-color:${c.cgt}">A. BADR (商业资产处置)</div>
-                        <div class="text-content">
-                            • <b>效果:</b> 税率降为 10%。<br>
-                            • <b>限额:</b> 终身 £1 Million。<br>
-                            • <b>条件:</b> 经营/持股 > 2年。
-                        </div>
-
-                        <div class="section-title" style="border-color:${c.cgt}">B. Rollover Relief (ROR)</div>
-                        <div class="text-content">卖旧买新，Gain 推迟。窗口：-1yr ~ +3yr。</div>
-
-                        <div class="section-title" style="border-color:${c.cgt}">C. Gift Relief</div>
-                        <div class="text-content">送商业资产，Gain 转移给受赠人。</div>
-
-                        <div class="section-title" style="border-color:${c.cgt}">D. PPR (私宅)</div>
-                        <div class="text-content">自住房豁免。最后 9 个月视同居住。</div>
+                        <table class="tax-table">
+                            <tr><th>Relief</th><th>Effect</th><th>Conditions</th></tr>
+                            <tr><td><b>BADR</b></td><td>10% Rate<br>£1m Limit</td><td>1. 卖生意(Sole/Partner >2yr)<br>2. 卖股份(5%+Emp >2yr)</td></tr>
+                            <tr><td><b>Investors</b></td><td>10% Rate<br>£10m Limit</td><td>未上市交易公司; 新股; >3年; 非员工。</td></tr>
+                            <tr><td><b>Rollover</b></td><td>Defer Gain</td><td>卖旧买新 (Qualifying Assets)<br>窗口: -1yr ~ +3yr</td></tr>
+                            <tr><td><b>Gift</b></td><td>Defer to Donee</td><td>商业资产; 联合申请。</td></tr>
+                            <tr><td><b>PPR</b></td><td>Exempt</td><td>自住房; Last 9mo deemed。</td></tr>
+                        </table>
                     `
                 }
             },
@@ -532,31 +364,42 @@ Total = £6,080</div>
                     html: `
                         <div class="case-box" style="border-color:${c.boss}; background:#fffbf0;">
                             <div class="case-header" style="color:#e67e22">Mr. Lucky 综合题</div>
-                            <div class="case-body"><b>背景：</b> Mr. Lucky (Higher Rate) 2025/26 操作：<br>1. 卖花瓶: 卖 £8k, 买 £4k。<br>2. 卖咖啡店 (Business): 赚 £200k (BADR)。<br>3. 卖股票: 1000股 @ £5 (2010买500@£1k; 2020买1000@£3k)。<br>4. BF Loss £500。</div>
+                            <div class="case-body"><b>背景：</b> Mr. Lucky (Higher Rate) 2025/26 操作：<br>1. 卖古董花瓶: 卖 £8,000, 买 £4,000。<br>2. 卖咖啡店: 赚 £200,000 (符合 BADR)。<br>3. 卖股票: 1000股 @ £5 (2010买500@£1k; 2020买1000@£3k)。<br>4. 其他: BF Loss £500。<br><b>任务:</b> 计算总 CGT。</div>
                             
                             <details open>
                                 <summary>查看详细解析</summary>
-                                <div class="ans"><b>Step 1: Chattel (Vase)</b>
-Marginal: 5/3 × (8000 - 6000) = £3,333.
-(Normal Gain 4k, 取小值) -> <b>£3,333</b>
+                                <div class="ans"><b>Step 1: 古董花瓶 (Chattel)</b>
+买 < 6k, 卖 > 6k -> Marginal Relief.
+Normal Gain = 8,000 - 4,000 = £4,000
+Restricted = 5/3 × (8,000 - 6,000) = £3,333
+取小值: <b>Chargeable Gain = £3,333</b>
 
-<b>Step 2: Business (BADR)</b>
-£200,000 @ 10% = <b>£20,000</b>
+<b>Step 2: 咖啡店 (Business)</b>
+Gain £200,000. 符合 BADR -> 税率 <b>10%</b>.
 
-<b>Step 3: Shares</b>
-Pool: 1500股, Cost (1k+3k)=£4k. Avg £2.67/股.
-Disposal Cost: 1000 × 2.67 = £2,667
+<b>Step 3: 股票 (Shares)</b>
+Share Pool:
+Total Shares = 500 + 1000 = 1,500
+Total Cost = 1,000 + 3,000 = £4,000
+Avg Cost = 4000 / 1500 = £2.67 / share
+
+Disposal Cost = 1,000 × 2.67 = £2,667
+Proceeds = 1,000 × 5 = £5,000
 Gain = 5,000 - 2,667 = <b>£2,333</b>
 
-<b>Step 4: Total Tax</b>
-Total Gains = 205,666
-(-) Loss £500 (-) AEA £3,000
-Taxable = £202,166
+<b>Step 4: 汇总计算 (Tax Liability)</b>
+Total Gains = 3,333 + 200,000 + 2,333 = £205,666
+Less: BF Loss (£500)
+Less: AEA (£3,000)
+<b>Taxable Gains = £202,166</b>
 
-Tax Calculation:
-1. BADR (200k) @ 10% = 20,000
-2. Remainder (2,166) @ 20% = 433
-<b>Total Tax = £20,433</b></div>
+<b>Tax Calculation:</b>
+1. BADR (Business): £200,000 @ 10% = <b>£20,000</b>
+2. Remaining (£2,166):
+   Rate: 20% (Higher Rate, Ordinary Assets)
+   Tax = 2,166 × 20% = <b>£433</b>
+
+<b>Total CGT Payable = £20,433</b></div>
                             </details>
                         </div>
                     `
@@ -564,23 +407,12 @@ Tax Calculation:
             }
         ];
 
-        // 连线
         const links = [
-            { source: 'root', target: 'iht_1' },
-            { source: 'iht_1', target: 'iht_2' },
-            { source: 'iht_2', target: 'iht_3' },
-            { source: 'iht_3', target: 'iht_4' },
-            { source: 'iht_4', target: 'iht_5' },
-            { source: 'iht_5', target: 'iht_boss' },
-            
-            { source: 'root', target: 'cgt_1' },
-            { source: 'cgt_1', target: 'cgt_2' },
-            { source: 'cgt_2', target: 'cgt_3' },
-            { source: 'cgt_3', target: 'cgt_4' },
-            { source: 'cgt_4', target: 'cgt_boss' }
+            { source: '0', target: 'iht_1' }, { source: 'iht_1', target: 'iht_2' }, { source: 'iht_2', target: 'iht_3' }, { source: 'iht_3', target: 'iht_boss' },
+            { source: '0', target: 'cgt_1' }, { source: 'cgt_1', target: 'cgt_2' }, { source: 'cgt_2', target: 'cgt_3' }, { source: 'cgt_3', target: 'cgt_4' }, { source: 'cgt_4', target: 'cgt_boss' }
         ];
 
-        // ================= ECharts 配置 =================
+        // ================= ECharts =================
         const option = {
             backgroundColor: 'transparent',
             series: [{
@@ -589,25 +421,23 @@ Tax Calculation:
                 data: data,
                 links: links,
                 roam: true,
+                draggable: true,
                 zoom: 0.85,
-                label: {
-                    show: true, position: 'bottom', color: '#7f8c8d', fontSize: 11, fontWeight: 'bold', formatter: '{b}',
-                    distance: 8
-                },
+                label: { show: true, position: 'bottom', color: '#888', fontSize: 11, fontWeight: '600', formatter: '{b}', distance: 8 },
                 itemStyle: { borderColor: '#fff', borderWidth: 2 },
-                lineStyle: { color: '#dcdcdc', width: 1.5, curveness: 0.2, opacity: 0.8 },
-                force: { repulsion: 500, edgeLength: 100, gravity: 0.06 }
+                lineStyle: { color: '#dcdcdc', width: 1.5, curveness: 0.15, opacity: 0.6 },
+                force: { repulsion: 450, edgeLength: 100, gravity: 0.06 }
             }]
         };
 
         myChart.setOption(option);
         window.addEventListener('resize', () => myChart.resize());
 
-        // ================= 交互逻辑 =================
+        // ================= 交互 =================
         const mask = document.getElementById('mask');
         const sheet = document.getElementById('sheet');
+        const content = document.getElementById('sheetContent');
         const titleDom = document.getElementById('sheetTitle');
-        const contentDom = document.getElementById('sheetContent');
 
         myChart.on('click', function(params) {
             if (params.data && params.data.info) openSheet(params.data);
@@ -625,9 +455,11 @@ Tax Calculation:
                 html = info.html;
             }
 
-            contentDom.innerHTML = html;
+            content.innerHTML = html;
             mask.classList.add('active');
             sheet.classList.add('active');
+            
+            if (window.MathJax) MathJax.typesetPromise();
         }
 
         function closeSheet() {
